@@ -1,6 +1,6 @@
 {
-  "name": "node-red-contrib-openanalytics",
-  "version": "0.0.2",
+  "name": "@openinc/node-red-contrib-openanalytics",
+  "version": "0.0.3",
   "description": "Node to Train AI Networks",
   "scripts": {
     "add-node": "node ./utils/add-node.js",
@@ -17,6 +17,17 @@
     "lint:fix": "prettier --ignore-path .eslintignore --write '**/*.{js,ts,md}'; eslint --ext .js,.ts . --fix"
   },
   "author": "Martin Stein",
+  "keywords": [
+    "node-red",
+    "node",
+    "ludwig",
+    "ai",
+    "machine learning",
+    "training",
+    "predict",
+    "forecast",
+    "autoencoder"
+  ],
   "contributors": [
     "Fraunhofer FIT",
     "open.INC GmbH"
