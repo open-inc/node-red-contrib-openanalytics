@@ -1,0 +1,40 @@
+<script type="text/html" data-help-name="ludwig-forecast">
+  <h2>Introduction</h2>
+  <p>The Ludwig Forecast node enables time series forecasting using a Ludwig model. It provides functionality for both training a new model and making predictions using an existing model.</p>
+
+  <h2>Configuration</h2>
+  <ul>
+      <li><strong>Mode:</strong> Specifies whether the node should train a new model ("train") or make predictions ("predict").</li>
+      <li><strong>Model Name:</strong> (Optional) The name of the Ludwig model to use for training or prediction. If not provided, a default name is generated based on the current timestamp. Set one if you want to have multiple version of the same model.</li>
+      <li><strong>Dimension:</strong> (Optional) The dimension of the time series data to consider for training or prediction. Defaults to 0.</li>
+      <li><strong>Window:</strong> (Optional) The size of the sliding window for training or prediction. Defaults to 24.</li>
+  </ul>
+
+  <h2>Input</h2>
+  <p>The node accepts time series data for training or prediction. The data should be provided in the <code>msg.payload.values</code> field.</p>
+  <p>In general data should be formatted as open.WARE JSON-Object in <code>msg.payload</code> field. See other nodes how to create the format</p>
+
+  <h2>Output</h2>
+  <ul>
+      <li><strong>Output 1:Training Updates:</strong> Process notification during model training are sent as messages with <code>exitcode</code> of the training process. 0 means no error. Other could me error during training or early stop because of evaluation criteria</li>
+      <li><strong>Output 2:Training Status:</strong> Updates of the training process</li>
+      <li><strong>Output 3:Error:</strong> If an error occurs during training or prediction, the node sends an error message.</li>
+      <li><strong>Output 4:Prediction Input:</strong> For prediction mode, the node sends the input data for prediction in the <code>msg.payload</code>.</li>
+      
+  </ul>
+
+  <h2>Usage</h2>
+  <ol>
+      <li><strong>Training:</strong> Set the mode to "train" and inject time series data to train a new model. The node will output training progress updates and the final training status.</li>
+      <li><strong>Prediction:</strong> Set the mode to "predict" and inject time series data for prediction. The node will output the input data for prediction.</li>
+      
+  </ol>
+  <p> Mode can also be set via <pre> msg.mode </pre> to overwrite the nodes setting (reuse node for training and predicition)</p>
+
+
+  
+  <footer>
+      <p>For more information, refer to the Ludwig documentation.</p>
+      <a href="https://ludwig.ai/latest/">Ludwig Docs</a>
+  </footer>
+</script>

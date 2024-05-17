@@ -1,0 +1,40 @@
+
+<script type="text/html" data-help-name="ludwig-predict">
+  <h2>Introduction</h2>
+  <p>The Ludwig Predict node enables prediction using a Ludwig model served through an HTTP server. It allows users to send data to the model for inference and receive predictions.</p>
+
+  <h2>Configuration</h2>
+  <ul>
+      <li><strong>Model Version:</strong> The version of the Ludwig model to use for prediction.</li>
+      <li><strong>Model Name:</strong> The name of the Ludwig model.</li>
+      <li><strong>Stop Server:</strong> Option to stop the server if it's running.</li>
+  </ul>
+
+  <h2>Input</h2>
+  <p>The node accepts input data for prediction. It expects the input data in the <code>msg.payload</code> field.</p>
+  <p>The data should be formatted as open.WARE JSON-Object in <code>msg.payload</code> field. See other nodes how to create the format</p>
+  <h2>Output</h2>
+  <ul>
+      <li><strong>Output 1: Prediction:</strong> The node sends the prediction result in the <code>msg.payload</code> field.</li>
+      <li><strong>Output 2: Status Updates:</strong> Status updates during server startup, shutdown, and errors are sent as separate messages.</li>
+  </ul>
+
+  <h2>Usage</h2>
+  <ol>
+      <li><strong>Start Server:</strong> Deploy the node to start the server and load the specified Ludwig model for prediction.</li>
+      <li><strong>Send Data:</strong> Inject data to the node's input. The node will send the data to the server for prediction.</li>
+      <li><strong>Receive Prediction:</strong> The node will output the prediction result in the <code>msg.payload</code>.</li>
+  </ol>
+
+  <h2>Additional Features</h2>
+  <p>The Ludwig Predict node provides additional HTTP endpoints:</p>
+  <ul>
+      <li><strong>/openware/ludwig/models:</strong> Retrieves available Ludwig models.</li>
+      <li><strong>/openware/ludwig/models/:name:</strong> Retrieves runs for a specific Ludwig model.</li>
+  </ul>
+
+  <footer>
+      <p>For more information, refer to the Ludwig documentation.</p>
+      <a href="https://ludwig.ai/latest/">Ludwig Docs</a>
+  </footer>
+</script>
