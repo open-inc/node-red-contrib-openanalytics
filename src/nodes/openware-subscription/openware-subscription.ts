@@ -1,0 +1,109 @@
+import { NodeInitializer } from "node-red";
+import {
+  OpenwareSubscriptionNode,
+  OpenwareSubscriptionNodeDef,
+} from "./modules/types";
+import WebSocket = require("ws");
+import { ConfigNode } from "../shared/types";
+import { SubscriptionMsgType } from "./shared/types";
+
+async function connect(
+  webSocket: WebSocket | null | undefined,
+  node: OpenwareSubscriptionNode,
+  server: ConfigNode,
+  sources: string[]
+) {
+  if (webSocket) {
+    webSocket.close();
+  }
+
+  console.log("connecting to WebSocket!", server);
+  webSocket = new WebSocket(
+    `${server.host.replace("http", "ws")}:${server.port}/subscription`
+  );
+  webSocket.on("open", () => {
+    console.log("Connected to WebSocket");
+    node.status({ fill: "blue", shape: "dot", text: "subscribing..." });
+    const msg = {
+      action: "subscribe",
+      session: server.credentials.session,
+      sources: sources,
+    };
+
+    webSocket!.send(JSON.stringify(msg));
+  });
+  webSocket.on("message", (event: string) => {
+    node.status({ fill: "green", shape: "dot", text: "connected" });
+    try {
+      const data = JSON.parse(event);
+      node.send({ payload: data });
+    } catch (error) {
+      console.error("Error parsing message\n" + event);
+    }
+  });
+  webSocket.on("close", (event: CloseEvent) => {
+    console.log("Disconnected from WebSocket", event);
+    node.status({ fill: "red", shape: "dot", text: "disconnected." });
+  });
+  webSocket.on("error", (event: Event) => {
+    node.status({
+      fill: "red",
+      shape: "dot",
+      text: "error" + JSON.stringify(event),
+    });
+  });
+}
+
+const nodeInit: NodeInitializer = (RED): void => {
+  function OpenwareSubscriptionNodeConstructor(
+    this: OpenwareSubscriptionNode,
+    config: OpenwareSubscriptionNodeDef
+  ): void {
+    let webSocket: WebSocket | null;
+    if (config.server === undefined) return;
+    const server = RED.nodes.getNode(config.server) as ConfigNode;
+    RED.nodes.createNode(this, config);
+    const node = this;
+    setTimeout(() => {
+      node.status({ fill: "red", shape: "dot", text: "disconnected." });
+    }, 500);
+
+    node.on("input", function (msg: SubscriptionMsgType) {
+      if (
+        (!msg.payload ||
+          !Array.isArray(msg.payload) ||
+          msg.payload.length < 1) &&
+        !msg.disconnect
+      ) {
+        node.status({
+          fill: "red",
+          shape: "dot",
+          text: "No sources specified in msg.payload",
+        });
+        return;
+      }
+
+      if (msg.disconnect) {
+        console.log("Disconnecting from WebSocket");
+        if (webSocket) {
+          webSocket.close();
+          webSocket = null;
+        }
+        return;
+      }
+      //node.send({ payload: { server: server, config: config } });
+      if (server.credentials.session) {
+        connect(webSocket, node, server, msg.payload as string[]);
+      } else {
+        node.status({ fill: "red", shape: "dot", text: "disconnected." });
+      }
+    });
+  }
+
+  RED.nodes.registerType(
+    "openware-subscription",
+    OpenwareSubscriptionNodeConstructor
+  );
+};
+
+export = nodeInit;

@@ -1,0 +1,487 @@
+[
+    {
+        "id": "ec22ab331161374c",
+        "type": "tab",
+        "label": "OW Test",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "e1e069c060c1c625",
+        "type": "inject",
+        "z": "ec22ab331161374c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 80,
+        "wires": [
+            [
+                "30a70c6f8932d517"
+            ]
+        ]
+    },
+    {
+        "id": "30a70c6f8932d517",
+        "type": "openware-sources",
+        "z": "ec22ab331161374c",
+        "server": "6f771f33e54cf16c",
+        "name": "openware-sources",
+        "x": 510,
+        "y": 80,
+        "wires": [
+            [
+                "c19a4ca809e04117"
+            ]
+        ]
+    },
+    {
+        "id": "c19a4ca809e04117",
+        "type": "debug",
+        "z": "ec22ab331161374c",
+        "name": "debug 9",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "4c5ba4e74a71dd49",
+        "type": "openware-items",
+        "z": "ec22ab331161374c",
+        "server": "6f771f33e54cf16c",
+        "name": "openware-items",
+        "x": 500,
+        "y": 140,
+        "wires": [
+            [
+                "c4c31ca337a40267"
+            ]
+        ]
+    },
+    {
+        "id": "c4c31ca337a40267",
+        "type": "debug",
+        "z": "ec22ab331161374c",
+        "name": "debug 10",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "14df78285fe52152",
+        "type": "inject",
+        "z": "ec22ab331161374c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 140,
+        "wires": [
+            [
+                "4c5ba4e74a71dd49"
+            ]
+        ]
+    },
+    {
+        "id": "8c1688e179355188",
+        "type": "openware-data-aggregate",
+        "z": "ec22ab331161374c",
+        "server": "6f771f33e54cf16c",
+        "name": "openware-data-aggregate",
+        "output": "JSON",
+        "delimiter": ",",
+        "interval": "hour",
+        "operation": "min",
+        "x": 530,
+        "y": 200,
+        "wires": [
+            [
+                "55240bc7ac7c5dc2"
+            ]
+        ]
+    },
+    {
+        "id": "908f27afba403fcb",
+        "type": "inject",
+        "z": "ec22ab331161374c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"source\":\"mstHome\", \"sensor\":\"powermeter\", \"dimension\":2}",
+        "payloadType": "json",
+        "x": 90,
+        "y": 200,
+        "wires": [
+            [
+                "48b8bef2849fb14c"
+            ]
+        ]
+    },
+    {
+        "id": "48b8bef2849fb14c",
+        "type": "function",
+        "z": "ec22ab331161374c",
+        "name": "function 4",
+        "func": "msg.payload.end = new Date().getTime();\nmsg.payload.start = msg.payload.end - 24*1000*3600;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 200,
+        "wires": [
+            [
+                "8c1688e179355188"
+            ]
+        ]
+    },
+    {
+        "id": "55240bc7ac7c5dc2",
+        "type": "debug",
+        "z": "ec22ab331161374c",
+        "name": "debug 11",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "b04028945bb05be9",
+        "type": "openware-data-live",
+        "z": "ec22ab331161374c",
+        "server": "6f771f33e54cf16c",
+        "name": "openware-data-live",
+        "amount": 1,
+        "output": "JSON",
+        "delimiter": ",",
+        "x": 510,
+        "y": 260,
+        "wires": [
+            [
+                "cb31ade3c3f7730a"
+            ]
+        ]
+    },
+    {
+        "id": "af5dfcbacb38bf76",
+        "type": "inject",
+        "z": "ec22ab331161374c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"source\":\"mstHome\", \"sensor\":\"powermeter\"}",
+        "payloadType": "json",
+        "x": 90,
+        "y": 260,
+        "wires": [
+            [
+                "b04028945bb05be9"
+            ]
+        ]
+    },
+    {
+        "id": "cb31ade3c3f7730a",
+        "type": "debug",
+        "z": "ec22ab331161374c",
+        "name": "debug 12",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "9ebe503758722014",
+        "type": "openware-data-historical",
+        "z": "ec22ab331161374c",
+        "server": "6f771f33e54cf16c",
+        "name": "openware-data-history",
+        "output": "JSON",
+        "delimiter": ",",
+        "x": 520,
+        "y": 320,
+        "wires": [
+            [
+                "880f61d03a747211"
+            ]
+        ]
+    },
+    {
+        "id": "a0a4d058e3d39a25",
+        "type": "inject",
+        "z": "ec22ab331161374c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"source\":\"mstHome\", \"sensor\":\"powermeter\"}",
+        "payloadType": "json",
+        "x": 90,
+        "y": 320,
+        "wires": [
+            [
+                "77329db6d048da69"
+            ]
+        ]
+    },
+    {
+        "id": "880f61d03a747211",
+        "type": "debug",
+        "z": "ec22ab331161374c",
+        "name": "debug 13",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "77329db6d048da69",
+        "type": "function",
+        "z": "ec22ab331161374c",
+        "name": "function 5",
+        "func": "msg.payload.end = new Date().getTime();\nmsg.payload.start = msg.payload.end - 24*1000*3600;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 320,
+        "wires": [
+            [
+                "9ebe503758722014"
+            ]
+        ]
+    },
+    {
+        "id": "87b055482c613011",
+        "type": "openware-subscription",
+        "z": "ec22ab331161374c",
+        "name": "",
+        "server": "6f771f33e54cf16c",
+        "x": 520,
+        "y": 380,
+        "wires": [
+            [
+                "a54bc75e624a96aa"
+            ]
+        ]
+    },
+    {
+        "id": "5bbfe6dbd0e86eee",
+        "type": "inject",
+        "z": "ec22ab331161374c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[\"mstHome\"]",
+        "payloadType": "json",
+        "x": 110,
+        "y": 380,
+        "wires": [
+            [
+                "87b055482c613011"
+            ]
+        ]
+    },
+    {
+        "id": "a54bc75e624a96aa",
+        "type": "debug",
+        "z": "ec22ab331161374c",
+        "name": "debug 14",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "ce0543c213f04098",
+        "type": "openware-subscription",
+        "z": "ec22ab331161374c",
+        "name": "",
+        "server": "6f771f33e54cf16c",
+        "x": 520,
+        "y": 440,
+        "wires": [
+            [
+                "d350cb8b3a5d69d6"
+            ]
+        ]
+    },
+    {
+        "id": "21940e3bd758da92",
+        "type": "inject",
+        "z": "ec22ab331161374c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[\"stein\"]",
+        "payloadType": "json",
+        "x": 90,
+        "y": 440,
+        "wires": [
+            [
+                "ce0543c213f04098"
+            ]
+        ]
+    },
+    {
+        "id": "d350cb8b3a5d69d6",
+        "type": "debug",
+        "z": "ec22ab331161374c",
+        "name": "debug 15",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "ad26910c8f2ddc6f",
+        "type": "openware-csv2ow",
+        "z": "ec22ab331161374c",
+        "name": "",
+        "x": 450,
+        "y": 740,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6f771f33e54cf16c",
+        "type": "openware-config",
+        "host": "https://openware.apps.openinc.dev",
+        "port": "443"
+    }
+]

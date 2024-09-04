@@ -1,7 +1,7 @@
 {
-  "name": "@openinc/node-red-contrib-openanalytics",
-  "version": "0.0.3",
-  "description": "Node to Train AI Networks",
+  "name": "@openinc/node-red-contrib-openware",
+  "version": "1.0.4",
+  "description": "Nodes to access a open.WARE Middleware by open.INC",
   "scripts": {
     "add-node": "node ./utils/add-node.js",
     "copy": "copyfiles -u 2 \"./src/nodes/**/*.{png,svg}\" \"./dist/nodes/\"",
@@ -12,32 +12,38 @@
     "build": "rimraf dist && yarn copy && yarn build:editor && yarn build:runtime",
     "test": "jest --forceExit --detectOpenHandles --colors",
     "test:watch": "jest --forceExit --detectOpenHandles --watchAll",
-    "dev": "rm -rf dist && yarn copy && concurrently --kill-others --names 'COPY,EDITOR,RUNTIME,TEST' --prefix '({name})' --prefix-colors 'yellow.bold,cyan.bold,greenBright.bold,magenta.bold' 'onchange -v \"src/**/*.png\" \"src/**/*.svg\" -- yarn copy' 'yarn build:editor:watch' 'yarn build:runtime:watch' 'sleep 10; yarn test:watch'",
+    "dev": "rimraf  dist && yarn copy && concurrently --kill-others --names 'COPY,EDITOR,RUNTIME,TEST' --prefix '({name})' --prefix-colors 'yellow.bold,cyan.bold,greenBright.bold,magenta.bold' 'onchange -v \"src/**/*.png\" \"src/**/*.svg\" -- yarn copy' 'yarn build:editor:watch' 'yarn build:runtime:watch' 'sleep 10; yarn test:watch'",
     "lint": "prettier --ignore-path .eslintignore --check '**/*.{js,ts,md}'; eslint --ext .js,.ts .",
-    "lint:fix": "prettier --ignore-path .eslintignore --write '**/*.{js,ts,md}'; eslint --ext .js,.ts . --fix"
+    "lint:fix": "prettier --ignore-path .eslintignore --write '**/*.{js,ts,md}'; eslint --ext .js,.ts . --fix",
+    "publish": "npm publish --access public"
   },
   "author": "Martin Stein",
   "keywords": [
     "node-red",
     "node",
-    "ludwig",
-    "ai",
-    "machine learning",
-    "training",
-    "predict",
-    "forecast",
-    "autoencoder"
+    "IoT",
+    "timeseries",
+    "open.WARE",
+    "open.DASH",
+    "open.INC"
   ],
   "contributors": [
-    "Fraunhofer FIT",
     "open.INC GmbH"
   ],
   "license": "MIT",
   "node-red": {
+    "version": ">=2.0.0",
     "nodes": {
-      "ludwig-predict": "./dist/nodes/ludwig-predict/ludwig-predict.js",
-      "ludwig-autoencoder": "./dist/nodes/ludwig-autoencoder/ludwig-autoencoder.js",
-      "ludwig-forecast": "./dist/nodes/ludwig-forecast/ludwig-forecast.js"
+      "openware-config": "./dist/nodes/openware-config/openware-config.js",
+      "openware-sources": "./dist/nodes/openware-sources/openware-sources.js",
+      "openware-items": "./dist/nodes/openware-items/openware-items.js",
+      "openware-subscription": "./dist/nodes/openware-subscription/openware-subscription.js",
+      "openware-data-send": "./dist/nodes/openware-data-send/openware-data-send.js",
+      "openware-data-live": "./dist/nodes/openware-data-live/openware-data-live.js",
+      "openware-data-historical": "./dist/nodes/openware-data-historical/openware-data-historical.js",
+      "openware-data-aggregate": "./dist/nodes/openware-data-aggregate/openware-data-aggregate.js",
+      "openware-csv2ow": "./dist/nodes/openware-csv2ow/openware-csv2ow.js",
+      "openware-stream-send": "./dist/nodes/openware-stream-send/openware-stream-send.js"
     }
   },
   "dependencies": {
@@ -48,14 +54,15 @@
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.0.0",
     "@types/express": "^4.17.9",
-    "@types/jest": "^26.0.15",
-    "@types/node": "^14.14.10",
-    "@types/node-red": "^1.1.1",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^22.5.0",
+    "@types/node-red": "^1.3.5",
     "@types/node-red-node-test-helper": "^0.2.1",
     "@types/sinon": "^9.0.9",
     "@types/supertest": "^2.0.10",
-    "@typescript-eslint/eslint-plugin": "^4.9.0",
-    "@typescript-eslint/parser": "^4.9.0",
+    "@types/ws": "^8.5.10",
+    "@typescript-eslint/eslint-plugin": "^8.2.0",
+    "@typescript-eslint/parser": "^8.2.0",
     "colorette": "^1.2.1",
     "concurrently": "^5.3.0",
     "copyfiles": "^2.4.1",
@@ -73,7 +80,7 @@
     "rimraf": "^5.0.7",
     "rollup": "^2.23.0",
     "ts-jest": "^26.4.4",
-    "typescript": "^4.1.2"
+    "typescript": "^5.5.4"
   },
   "jest": {
     "testEnvironment": "node",

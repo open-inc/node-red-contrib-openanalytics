@@ -1,68 +1,43 @@
-# @openinc/node-red-contrib-openanalytics
+# @openinc/node-red-contrib-openware
 
-This Node-RED package contains nodes for working with machine learning models using the Ludwig library. It includes nodes for making predictions with trained models, training autoencoders, and training forecast models from time series data. It assumes that python [Ludwig](https://github.com/uber/ludwig) is installed and available as shell commands.
+## Overview
 
-## Nodes
+`@openinc/node-red-contrib-openware` is a Node-RED package providing nodes to access the open.WARE Middleware by open.INC. It enables easy integration and manipulation of IoT timeseries data within the Node-RED environment.
 
-### ludwig-predict
+## Features
 
-This node is used to run predictions using models that have been previously trained. These can be selected on the settings of the node. It will start an endpoint for each model and call its api.
-
-**Inputs:**
-
-- `payload`: The input data for prediction, which is typically passed through the initial training node in `predict`-mode
-
-**Outputs:**
-
-- `payload`: The prediction results.
-
-### ludwig-autoencoder
-
-This node is used to train autoencoders from time series data.
-
-**Inputs:**
-
-- `payload`: The training data for the autoencoder.
-
-**Outputs:**
-
-- `payload`: Updates of the Training shell process.
-
-### ludwig-forecast
-
-This node is used to train forecast models from time series data.
-
-**Inputs:**
-
-- `payload`: The training data for the forecast model.
-
-**Outputs:**
-
-- `payload`: Updates of the Training shell process.
+- Access open.WARE Middleware
+- Handle IoT timeseries data
+- Nodes for configuration, data sources, items, subscription, and various data operations
+- Convert CSV data to open.WARE format
 
 ## Installation
 
-To install this package, run the following command in your Node-RED user directory (typically `~/.node-red`):
+To install the package, run:
 
 ```sh
-npm install @openinc/node-red-contrib-openanalytics
+npm install @openinc/node-red-contrib-openware
 ```
 
-## Usage
+## Nodes
 
-1. Drag the desired nodes from the palette to your flow.
-2. Configure the nodes with the appropriate parameters.
-3. Connect the nodes to other nodes as needed to build your flow.
-4. Deploy your flow to start using the nodes.
+### Configuration Nodes
 
-## Contributing
+- **openware-config**: Configuration node to connect to open.WARE Middleware.
 
-Contributions are welcome! Please fork the repository and submit a pull request with your changes.
+### Functional Nodes
 
-## License
+- **openware-sources**: Manage data sources.
+- **openware-items**: Manage items within data sources.
+- **openware-subscription**: Subscribe to data changes.
+- **openware-data-send**: Send data to open.WARE.
+- **openware-data-live**: Retrieve live data.
+- **openware-data-historical**: Retrieve historical data.
+- **openware-data-aggregate**: Retrieve aggregated data.
+- **openware-csv2ow**: Convert CSV data to open.WARE format.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Get your own open.WARE Instance
 
-## Acknowledgements
-
-This project uses the Ludwig library for machine learning tasks. For more information about Ludwig, visit [Ludwig on GitHub](https://github.com/uber/ludwig).
+Unlock the potential of your small or medium-sized enterprise with open.WARE MES, the cutting-edge IoT middleware from open.INC. Seamlessly integrate and manage your IoT timeseries data, optimize operations, and drive efficiency like never before.
+Discover how open.WARE MES can transform your business.
+Contact us at info@openinc.de to get a personalized quote and start your journey towards smarter manufacturing today!

@@ -1,0 +1,53 @@
+<script type="text/html" data-help-name="openware-stream-send">
+  <h1>OpenWARE Stream Send Node</h1>
+
+    <h2>Introduction</h2>
+    <p>The OpenWARE Stream Send node allows you to send data streams to an open.WARE server via WebSocket. This node is useful for real-time data transmission where the data is sent as a continuous stream to an open.WARE instance.</p>
+
+    <h2>Node Configuration</h2>
+    <ul>
+        <li><strong>Name:</strong> <br> A user-defined label for the node instance, used to identify the node in your flow.</li>
+        <li><strong>Server:</strong> <br> The configuration for the open.WARE server where the data stream will be sent. This must be a valid and authenticated server configuration node.</li>
+        <li><strong>Mode:</strong> <br> Specifies the operation mode of the node, which determines how the data is processed before being sent.</li>
+    </ul>
+
+    <h2>Input</h2>
+    <p>This node accepts one input:</p>
+    <ul>
+        <li>A message object (<code>msg</code>) containing the data to be sent. The <code>msg.payload</code> must include the following fields:
+            <ul>
+                <li><code>id</code>: The ID of the data item.</li>
+                <li><code>name</code>: The name of the data item.</li>
+                <li><code>source</code>: The source of the data item.</li>
+                <li><code>valueTypes</code>: An array defining the types of values being sent.</li>
+                <li><code>values</code>: An array of values to be streamed.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2>Operation</h2>
+    <p>When the node receives a message, it attempts to send the data through a WebSocket connection to the configured open.WARE server. If the WebSocket connection is not established or the payload is incorrect, the node will update its status to reflect the issue.</p>
+
+    <h2>Status Indicators</h2>
+    <p>The node provides status feedback to help you understand its current state:</p>
+    <ul>
+        <li><span style="color: red;">Red dot with "disconnected.":</span> This indicates that the node is not connected to the WebSocket server.</li>
+        <li><span style="color: green;">Green dot with "Connected":</span> This indicates that the node has successfully connected to the WebSocket server and is ready to send data.</li>
+        <li><span style="color: red;">Red dot with "No or wrong data in msg.payload":</span> This indicates that the input message does not contain the correct payload format.</li>
+        <li><span style="color: red;">Red dot with "Login data incorrect / missing":</span> This indicates that the server credentials are missing or incorrect.</li>
+        <li><span style="color: red;">Red dot with "error...":</span> This indicates a connection error occurred, and the event details are shown in the status text.</li>
+    </ul>
+
+    <h2>Reconnection Logic</h2>
+    <p>If the WebSocket connection is lost, the node will automatically attempt to reconnect after 2 seconds. This ensures continuous data streaming in case of temporary network issues.</p>
+
+    <h2>Usage</h2>
+    <p>To use the OpenWARE Stream Send node:</p>
+    <ol>
+        <li>Drag and drop the node into your Node-RED workspace.</li>
+        <li>Configure the node by selecting a valid and authenticated open.WARE server configuration and setting the appropriate mode.</li>
+        <li>Connect the node to other nodes that will supply the input message containing the data to be streamed.</li>
+        <li>Deploy your flow. The node will establish a WebSocket connection to the server and start streaming the data when it receives input messages.</li>
+    </ol>
+
+</script>

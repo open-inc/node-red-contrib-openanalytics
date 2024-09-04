@@ -1,0 +1,45 @@
+
+<script type="text/html" data-help-name="openware-data-send">
+
+ 
+  <h1>OpenWARE Data Send Node</h1>
+
+  <h2>Introduction</h2>
+  <p>The OpenWARE Data Send node allows you to send data to an open.WARE server. You can choose between different modes to either push new data or update existing data on the server.</p>
+
+  <h2>Node Configuration</h2>
+  <ul>
+      <li><strong>Name:</strong> <br> The name of the node instance, used to label the node within your flow.</li>
+      <li><strong>Server:</strong> <br> The open.WARE server configuration to which data will be sent.</li>
+      <li><strong>Mode:</strong> <br> Specifies how data should be handled:
+          <ul>
+              <li><strong>Push:</strong> Add new data without overwriting existing entries.</li>
+              <li><strong>Update:</strong> Upsert and overwrite existing data entries.</li>
+          </ul>
+      </li>
+  </ul>
+
+ 
+  <h2>Input</h2>
+  <p>This node accepts one input:</p>
+  <ul>
+      <li>A message object (<code>msg</code>) containing the data to be sent to the open.WARE server. The data to be sent should be placed in <code>msg.payload</code> and follow the <a href="https://docs.openinc.dev/docs/openware/BasicDataFormat">open.WARE data format</a>.</li>
+  </ul>
+
+  <h2>Output</h2>
+  <p>This node produces one output:</p>
+  <ul>
+      <li>A message object (<code>msg</code>) with the response from the server, indicating the success or failure of the data transmission.</li>
+  </ul>
+
+  <h2>Usage</h2>
+  <p>To use the OpenWARE Data Send node:</p>
+  <ol>
+      <li>Drag and drop the node into your Node-RED workspace.</li>
+      <li>Configure the node by specifying the server, a name for the node instance, and the mode (push or update).</li>
+      <li>Connect the node to other nodes in your flow to trigger data sending and handle the server response.</li>
+      <li>Deploy your flow. When the node receives an input message, it will send the data to the configured open.WARE server according to the selected mode.</li>
+  </ol>
+
+      
+  </script>
