@@ -17,8 +17,6 @@ const nodeInit: NodeInitializer = (RED): void => {
 
     const node = this;
 
-    setTimeout(() => {}, 500);
-
     this.wsConnecting = setInterval(() => {
       if (server && server.credentials.session) {
         if (OPEN_SOCKETS[node.id]) {
@@ -45,16 +43,30 @@ const nodeInit: NodeInitializer = (RED): void => {
           OPEN_SOCKETS[node.id].readyState === WebSocket.CLOSED ||
           OPEN_SOCKETS[node.id].readyState === WebSocket.CLOSING
         ) {
-          OPEN_SOCKETS[node.id] = connect(node, server);
+          const res = connect(node, server);
+          if (res) {
+            OPEN_SOCKETS[node.id] = res;
+          } else {
+            if (OPEN_SOCKETS[node.id]) {
+              OPEN_SOCKETS[node.id].terminate();
+            }
+            delete OPEN_SOCKETS[node.id];
+          }
         }
+      } else {
+        node.status({
+          fill: "red",
+          shape: "dot",
+          text: "No or wrong login data.",
+        });
       }
     }, 1000);
 
     node.on("close", function () {
       console.log("Cleanup WebSocket", node.id);
-      if (node.webSocket) {
-        node.webSocket.terminate();
-        node.webSocket = undefined;
+      if (OPEN_SOCKETS[node.id]) {
+        OPEN_SOCKETS[node.id].terminate();
+        delete OPEN_SOCKETS[node.id];
       }
       if (node.wsConnecting) {
         clearInterval(node.wsConnecting);
@@ -114,29 +126,37 @@ const nodeInit: NodeInitializer = (RED): void => {
     console.log(
       "[" + node.id + "]Connecting to WebSocket: " + connectionString
     );
-    const newWebSocket = new WebSocket(connectionString);
-    newWebSocket.on("open", () => {
-      console.log("Connected to WebSocket " + connectionString);
-      node.status({ fill: "green", shape: "dot", text: "Connected" });
-    });
-    newWebSocket.on("message", (event: string) => {
-      node.send({ payload: JSON.parse(event) });
-    });
-    newWebSocket.on("close", (event: CloseEvent) => {
-      console.log("Disconnected from WebSocket", event);
-      node.status({ fill: "red", shape: "dot", text: "disconnected." });
-      // setTimeout(() => {
-      //   OPEN_SOCKETS[node.id] = connect(node, server);
-      // }, 2000);
-    });
-    newWebSocket.on("error", (event: Event) => {
-      node.status({
-        fill: "red",
-        shape: "dot",
-        text: "error" + JSON.stringify(event),
+    let newWebSocket: WebSocket;
+    try {
+      newWebSocket = new WebSocket(connectionString);
+      newWebSocket.on("open", () => {
+        console.log("Connected to WebSocket " + connectionString);
       });
-    });
-    return newWebSocket;
+      newWebSocket.on("message", (event: string) => {
+        node.send({ payload: JSON.parse(event) });
+      });
+      newWebSocket.on("close", (event: CloseEvent) => {
+        console.log("Disconnected from WebSocket", event);
+        // setTimeout(() => {
+        //   OPEN_SOCKETS[node.id] = connect(node, server);
+        // }, 2000);
+      });
+      newWebSocket.on("error", (event: Event) => {
+        node.status({
+          fill: "red",
+          shape: "dot",
+          text: "error" + JSON.stringify(event),
+        });
+      });
+      return newWebSocket;
+    } catch (e: any) {
+      RED.log.error(
+        "Error connecting to WebSocket\n" + e.message ||
+          e.reason ||
+          JSON.stringify(e)
+      );
+      return null;
+    }
   }
 };
 

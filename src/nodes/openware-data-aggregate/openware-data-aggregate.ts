@@ -43,9 +43,14 @@ const nodeInit: NodeInitializer = (RED): void => {
               action: "source_aggregation",
               params: {
                 operation:
-                  (<HistoricPayloadType>msg.payload).operation || "mean",
+                  (<HistoricPayloadType>msg.payload).operation ||
+                  config.operation ||
+                  "mean",
                 dimension: (<HistoricPayloadType>msg.payload).dimension || 0,
-                timeinterval: config.interval || "day",
+                timeinterval:
+                  (<HistoricPayloadType>msg.payload).interval ||
+                  config.interval ||
+                  "day",
                 start: (<HistoricPayloadType>msg.payload).start,
                 end: (<HistoricPayloadType>msg.payload).end,
                 source: (<HistoricPayloadType>msg.payload).source,
@@ -55,11 +60,12 @@ const nodeInit: NodeInitializer = (RED): void => {
           ],
         };
         const data = await server.api.pipe(pipe);
-        if (data.status === "error") {
+        console.log(JSON.stringify(data, null, 2));
+        if (data.status !== "success") {
           node.status({
             fill: "red",
             shape: "dot",
-            text: "Error fetching data.",
+            text: "Error fetching data." + data.payload.error,
           });
           node.error(data);
           return;

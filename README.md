@@ -29,6 +29,7 @@ npm install @openinc/node-red-contrib-openware
 
 - **openware-sources**: Manage data sources.
 - **openware-items**: Manage items within data sources.
+- **openware-item-select**: Helper to create msg-parameters for history,aggregate & live node.
 - **openware-subscription**: Subscribe to data changes.
 - **openware-data-send**: Send data to open.WARE.
 - **openware-data-live**: Retrieve live data.

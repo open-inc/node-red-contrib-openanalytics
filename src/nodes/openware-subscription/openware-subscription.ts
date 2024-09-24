@@ -7,8 +7,8 @@ import WebSocket = require("ws");
 import { ConfigNode } from "../shared/types";
 import { SubscriptionMsgType } from "./shared/types";
 
-async function connect(
-  webSocket: WebSocket | null | undefined,
+function connect(
+  webSocket: WebSocket | null,
   node: OpenwareSubscriptionNode,
   server: ConfigNode,
   sources: string[]
@@ -52,6 +52,7 @@ async function connect(
       text: "error" + JSON.stringify(event),
     });
   });
+  return webSocket;
 }
 
 const nodeInit: NodeInitializer = (RED): void => {
@@ -59,7 +60,6 @@ const nodeInit: NodeInitializer = (RED): void => {
     this: OpenwareSubscriptionNode,
     config: OpenwareSubscriptionNodeDef
   ): void {
-    let webSocket: WebSocket | null;
     if (config.server === undefined) return;
     const server = RED.nodes.getNode(config.server) as ConfigNode;
     RED.nodes.createNode(this, config);
@@ -67,6 +67,15 @@ const nodeInit: NodeInitializer = (RED): void => {
     setTimeout(() => {
       node.status({ fill: "red", shape: "dot", text: "disconnected." });
     }, 500);
+
+    node.on("close", function () {
+      console.log("Disconnecting from WebSocket");
+      if (node.webSocket) {
+        node.webSocket.close();
+        node.webSocket = null;
+        console.log("Disconnected");
+      }
+    });
 
     node.on("input", function (msg: SubscriptionMsgType) {
       if (
@@ -85,15 +94,20 @@ const nodeInit: NodeInitializer = (RED): void => {
 
       if (msg.disconnect) {
         console.log("Disconnecting from WebSocket");
-        if (webSocket) {
-          webSocket.close();
-          webSocket = null;
+        if (node.webSocket) {
+          node.webSocket.close();
+          node.webSocket = null;
         }
         return;
       }
       //node.send({ payload: { server: server, config: config } });
       if (server.credentials.session) {
-        connect(webSocket, node, server, msg.payload as string[]);
+        node.webSocket = connect(
+          node.webSocket,
+          node,
+          server,
+          msg.payload as string[]
+        );
       } else {
         node.status({ fill: "red", shape: "dot", text: "disconnected." });
       }

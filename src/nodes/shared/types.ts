@@ -34,6 +34,7 @@ export type DataItemMessage =
   | { status: "error"; payload: errorType; url?: string };
 
 export type OWItemType = {
+  name: string;
   source: string;
   id: string;
   type: string;

@@ -1,6 +1,6 @@
 {
   "name": "@openinc/node-red-contrib-openware",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Nodes to access a open.WARE Middleware by open.INC",
   "scripts": {
     "add-node": "node ./utils/add-node.js",
@@ -43,7 +43,8 @@
       "openware-data-historical": "./dist/nodes/openware-data-historical/openware-data-historical.js",
       "openware-data-aggregate": "./dist/nodes/openware-data-aggregate/openware-data-aggregate.js",
       "openware-csv2ow": "./dist/nodes/openware-csv2ow/openware-csv2ow.js",
-      "openware-stream-send": "./dist/nodes/openware-stream-send/openware-stream-send.js"
+      "openware-stream-send": "./dist/nodes/openware-stream-send/openware-stream-send.js",
+      "openware-item-select": "./dist/nodes/openware-item-select/openware-item-select.js"
     }
   },
   "dependencies": {

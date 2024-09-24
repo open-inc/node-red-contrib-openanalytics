@@ -136,16 +136,21 @@ export async function initApi(node: ConfigNode) {
       text = await resp.text();
       const result = JSON.parse(text);
       if (result.status === 200) {
-        return result.result;
+        return {
+          status: "success",
+          item: result.result,
+          payload: result.result,
+          request: pipe,
+        } as DataItemMessage;
+      } else {
+        throw new Error(text);
       }
-      return {
-        status: "success",
-        item: result,
-        payload: result,
-        request: pipe,
-      };
     } catch (e) {
-      return { status: "error", payload: { error: e, response: text }, url };
+      return {
+        status: "error",
+        payload: { error: e, response: text },
+        url,
+      } as DataItemMessage;
     }
   };
   const send = async (

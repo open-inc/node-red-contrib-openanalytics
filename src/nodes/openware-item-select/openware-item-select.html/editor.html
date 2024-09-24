@@ -1,0 +1,37 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.17.0/cdn/themes/light.css" />
+<script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.17.0/cdn/shoelace-autoloader.js"></script>
+
+<script type="text/html" data-template-name="openware-item-select">
+  <div class="form-row">
+
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+</div>
+  <div class="form-row">
+    <label for="node-input-server"><i class="fa fa-tag"></i> Server</label>
+    <input type="text" id="node-input-server" placeholder="Server...">
+  </div>
+  <div class="form-row">
+    <label for="node-input-item">Item</label>
+    <!-- <sl-select id="node-input-items" multiple clearable> -->
+      <sl-select id="node-input-item" style="width:70%; display: inline-block;" clearable> 
+      <!-- <sl-option value="option-1">Option 1</sl-option> -->
+    </sl-select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-dim">Dimension</label>
+    <!-- <sl-select id="node-input-items" multiple clearable> -->
+      <sl-select id="node-input-dim" style="width:70%; display: inline-block;" clearable> 
+      <!-- <sl-option value="option-1">Option 1</sl-option> -->
+    </sl-select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-start"><i class="icon-clock"></i> Start</label>
+    <input type="datetime-local" id="node-input-start" placeholder="Start">
+  </div>
+  <div class="form-row">
+     <label for="node-input-end"><i class="icon-clock"></i> End</label>
+    <input type="datetime-local" id="node-input-end" placeholder="End">
+  </div>
+</script>
