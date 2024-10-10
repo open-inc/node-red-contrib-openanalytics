@@ -53,7 +53,7 @@ RED.nodes.registerType<OpenwareItemSelectEditorNodeProperties>(
       itemsSelect!.innerHTML = items
         .sort((a, b) => (a.source + a.name).localeCompare(b.source + b.name))
         .map((item) => {
-          return `<sl-option value="${item.source}---${item.id}">[${item.source}] ${item.name}</sl-option>`;
+          return `<sl-option value="${item.source}---${item.id}">[${item.source}] ${item.name} - ${item.id}</sl-option>`;
         })
         .join("\n");
 
