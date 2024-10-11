@@ -44,7 +44,9 @@
       "openware-data-aggregate": "./dist/nodes/openware-data-aggregate/openware-data-aggregate.js",
       "openware-csv2ow": "./dist/nodes/openware-csv2ow/openware-csv2ow.js",
       "openware-stream-send": "./dist/nodes/openware-stream-send/openware-stream-send.js",
-      "openware-item-select": "./dist/nodes/openware-item-select/openware-item-select.js"
+      "openware-item-select": "./dist/nodes/openware-item-select/openware-item-select.js",
+      "openware-item-multiple-select": "./dist/nodes/openware-item-multiple-select/openware-item-multiple-select.js",
+      "openware-data-historical-merge": "./dist/nodes/openware-data-historical-merge/openware-data-historical-merge.js"
     }
   },
   "dependencies": {
