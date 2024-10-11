@@ -1,3 +1,34 @@
 <script type="text/html" data-help-name="openware-item-select">
-  <p>Node description goes here.</p>
+  <h1>openWARE Item Select Node</h1>
+  <p>The node allows to define a data request object that can be passed to an openWARE historical data node.</p>
+
+  <h2>Node Configuration</h2>
+  <ul>
+    <li><strong>Name:</strong> <br> The name of the node instance. This name is used to label the node within your flow.</li>
+    <li><strong>Server:</strong> <br> The open.WARE server configuration from which to fetch the items. This should be configured to connect to your open.WARE instance.<strong>When first configuring or selecting, save the node config once before entering Item and Dimension information.</strong> Otherwise the Item and Dimension dropdown menus are empty.</li>
+    <li><strong>Item:</strong>The sensor item that is to be requested. <strong>If the dropdown is empty</strong> save&close and reopen the configuration after selecting the server.</li>
+    <li><strong>Dimension:</strong>The dimension of the server, that is to be pulled.</li>
+    <li><strong>Start:</strong>The start date/time of the desired time interval.</li>
+    <li><strong>End:</strong>The end date/time of the desired time interval.</li>
+  </ul>
+
+  <h2>Input</h2>
+  <p>The node only needs a trigger (e.g. by an inject node)</p>
+
+  <h2>Output</h2>
+  <p>The node sends the information in the following forward, which is expected by the openWARE historical node:</p>
+  <ul>
+    <li><strong>source:</strong> The source of the data.</li>
+    <li><strong>sensor:</strong> The sensor ID.</li>
+    <li><strong>start:</strong> The start date/time for the data aggregation.</li>
+    <li><strong>end:</strong> The end date/time for the data aggregation.</li>
+  </ul>
+
+  <h2>Usage</h2>
+  <ol>
+    <li><strong>Configure the node:</strong> Specify the server, item, dimension, start and end date/time.</li>
+    <li><strong>Connect:</strong>Connect the output of the node to an openWARE historical node.</li>
+    <li><strong>Trigger the node:</strong> Send a message to the node to trigger the data request.</li>
+    <li><strong>Output:</strong> The node sends the data request to the openWARE historical node.</li>
+  </ol>
 </script>

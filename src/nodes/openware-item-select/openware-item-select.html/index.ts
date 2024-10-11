@@ -25,58 +25,77 @@ RED.nodes.registerType<OpenwareItemSelectEditorNodeProperties>(
       return this.name || "openware item select";
     },
     oneditprepare: async function () {
-      const itemsReq = await fetch(`/openware/itemselect/${this.server}`);
-      const items = (await itemsReq.json()) as OWItemType[];
+      console.log("On edit prepare");
       const itemsSelect = document.getElementById("node-input-item");
       const cItemValue = this.item.split("---");
       const dimSelect = document.getElementById("node-input-dim");
-      if (itemsSelect && cItemValue.length === 2) {
-        itemsSelect["value"] = cItemValue.join("---") as string;
+      const setDimSelectFromSelectedItem = (selectedItem: OWItemType, setValue: boolean) => {
         if (dimSelect) {
-          dimSelect["value"] =
-            //@ts-expect-error
-            this.dim instanceof Number ? this.dim : parseInt(this.dim);
-
-          const selected = items.find(
-            (item) => item.id === cItemValue[1] && item.source === cItemValue[0]
-          );
-          if (selected) {
-            dimSelect!.innerHTML = selected.valueTypes
-              .map((dim, index) => {
-                return `<sl-option value="${index}">${dim.name}</sl-option>`;
-              })
-              .join("\n");
-            dimSelect!["value"] = this.dim;
-          }
-        }
-      }
-      itemsSelect!.innerHTML = items
-        .sort((a, b) => (a.source + a.name).localeCompare(b.source + b.name))
-        .map((item) => {
-          return `<sl-option value="${item.source}---${item.id}">[${item.source}] ${item.name} - ${item.id}</sl-option>`;
-        })
-        .join("\n");
-
-      itemsSelect?.addEventListener("sl-change", (event) => {
-        //@ts-expect-error
-        const sourceId = (event?.target.value || "").split("---");
-        if (sourceId.length !== 2) {
-          alert("Invalid selection");
-          return;
-        }
-        const selected = items.find(
-          (item) => item.id === sourceId[1] && item.source === sourceId[0]
-        );
-        if (!selected) {
-          alert("Invalid selection");
-          return;
-        }
-        dimSelect!.innerHTML = selected.valueTypes
-          .sort((a, b) => a.name.localeCompare(b.name))
+          dimSelect!.innerHTML = selectedItem.valueTypes
           .map((dim, index) => {
             return `<sl-option value="${index}">${dim.name}</sl-option>`;
           })
           .join("\n");
+          if (setValue) {
+            dimSelect!["value"] = this.dim;
+          }
+        }
+      }
+
+      const fetchItemAndDims = async () => {
+        const itemsReq = await fetch(`/openware/itemselect/${this.server}`);
+        const items = (await itemsReq.json()) as OWItemType[];
+        
+        // If the config is reopened then we need to set the value of the select for input and dimension:
+        if (itemsSelect && cItemValue.length === 2) {
+          itemsSelect["value"] = cItemValue.join("---") as string;
+          if (dimSelect) {
+            dimSelect["value"] =
+              //@ts-expect-error
+              this.dim instanceof Number ? this.dim : parseInt(this.dim);
+
+            const selected = items.find(
+              (item) => item.id === cItemValue[1] && item.source === cItemValue[0]
+            );
+            if (selected) {
+              setDimSelectFromSelectedItem(selected, true);
+            }
+          }
+        }
+        itemsSelect!.innerHTML = items
+          .sort((a, b) => (a.source + a.name).localeCompare(b.source + b.name))
+          .map((item) => {
+            return `<sl-option value="${item.source}---${item.id}">[${item.source}] ${item.name} - ${item.id}</sl-option>`;
+          })
+          .join("\n");
+
+        itemsSelect?.addEventListener("sl-change", (event) => {
+          //@ts-expect-error
+          const sourceId = (event?.target.value || "").split("---");
+          if (sourceId.length !== 2) {
+            alert("Invalid selection");
+            return;
+          }
+          const selected = items.find(
+            (item) => item.id === sourceId[1] && item.source === sourceId[0]
+          );
+          if (!selected) {
+            alert("Invalid selection");
+            return;
+          }
+          setDimSelectFromSelectedItem(selected, false);
+        });
+      }
+      
+      if (this.server !== "") {
+        fetchItemAndDims()
+      }
+      
+      const serverSelect = document.getElementById("node-input-server");
+      serverSelect?.addEventListener("change", async (event) => {
+        console.log("server change", event.target["value"]);
+        this.server = event.target["value"];
+        fetchItemAndDims();
       });
     },
   }
