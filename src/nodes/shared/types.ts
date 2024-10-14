@@ -3,7 +3,7 @@ import { ChildProcessWithoutNullStreams } from "node:child_process";
 import { Node, NodeDef } from "node-red";
 export type ProcessChild = ChildProcessWithoutNullStreams | undefined | null;
 export type ValueType = {
-  type: "number" | "string" | "boolean" | "geo" | "object";
+  type: "number" | "string" | "boolean" | "geo" | "object" | "String" | "Boolean" | "Number" | "Geo" | "Object";
   name: string;
   unit: string;
 };
@@ -42,11 +42,7 @@ export type OWItemType = {
     date: number;
     value: any[];
   }[];
-  valueTypes: {
-    name: string;
-    type: "String" | "Boolean" | "Number" | "Geo" | "Object";
-    unit: string;
-  }[];
+  valueTypes: ValueType[];
 };
 
 export type ConfigNode = Node & {

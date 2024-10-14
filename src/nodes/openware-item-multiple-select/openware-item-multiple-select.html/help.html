@@ -1,6 +1,6 @@
-<script type="text/html" data-help-name="openware-item-select">
+<script type="text/html" data-help-name="openware-item-multiple-select">
   <h1>openWARE Item Select Node</h1>
-  <p>The node allows to define a data request object that can be passed to an openWARE historical data node.</p>
+  <p>The node allows to define a data request object that can be passed to an openWARE historical merge data node.</p>
 
   <h2>Node Configuration</h2>
   <ul>
@@ -18,8 +18,7 @@
   <h2>Output</h2>
   <p>The node sends the information in the following forward, which is expected by the openWARE historical node:</p>
   <ul>
-    <li><strong>source:</strong> The source of the data.</li>
-    <li><strong>sensor:</strong> The sensor ID.</li>
+    <li><strong>sourceInfo:</strong> An array of sensor information consisting of <code>source</code>, <code>sensor</code>(id) and <code>dimension</code></li>
     <li><strong>start:</strong> The start date/time for the data aggregation.</li>
     <li><strong>end:</strong> The end date/time for the data aggregation.</li>
   </ul>
@@ -27,8 +26,8 @@
   <h2>Usage</h2>
   <ol>
     <li><strong>Configure the node:</strong> Specify the server, item, dimension, start and end date/time.</li>
-    <li><strong>Connect:</strong>Connect the output of the node to an openWARE historical node.</li>
+    <li><strong>Connect:</strong>Connect the output of the node to an openWARE historical merge node.</li>
     <li><strong>Trigger the node:</strong> Send a message to the node to trigger the data request.</li>
-    <li><strong>Output:</strong> The node sends the data request to the openWARE historical node.</li>
+    <li><strong>Output:</strong> The node sends the data request to the openWARE historical merge node.</li>
   </ol>
 </script>

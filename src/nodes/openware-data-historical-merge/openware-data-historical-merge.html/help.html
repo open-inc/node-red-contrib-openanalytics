@@ -1,0 +1,37 @@
+<script type="text/html" data-help-name="openware-data-historical-merge">
+  <h1>OpenWARE Historical Merge Node</h1>
+
+  <h2>Introduction</h2>
+  <p>The OpenWARE Historical Merge node merges and synchronizes sensor data from multiple sensors in a given time span.</p>
+
+  <h2>Node Configuration</h2>
+  <ul>
+    <li><strong>Server:</strong> <br> The open.WARE server configuration from which to fetch the items. This should be configured to connect to your open.WARE instance.</li>
+    <li><strong>Output Format:</strong> Specifies the format for output data (JSON, VALUES_ONLY, CSV).</li>
+    <li><strong>Delimiter:</strong> (For CSV output) The delimiter to use for CSV formatting.</li>
+  </ul>
+
+  <h2>Input</h2>
+    <p>The node expects input messages containing parameters for merging sensor data on openWARE:</p>
+  <ul>
+      <li><strong>sensorInfos:</strong> An array of sensor information consisting of <code>source</code>, <code>sensor</code>(id) and <code>dimension</code></li>
+      <li><strong>start:</strong> The start date/time of the historical time span.</li>
+      <li><strong>end:</strong> The end date/time of the historical time span.</li>
+      <li><strong>pipe:</strong> (Optional) Custom data pipeline sent to openWARE (Expert function: Leads to a complete overwrite of the merge operation)</li>
+  </ul>
+
+  <h2>Output</h2>
+  <p>The node sends historical data in the specified format:</p>
+  <ul>
+      <li><strong>JSON:</strong> Output data in JSON format.</li>
+      <li><strong>VALUES_ONLY:</strong> Output only the values of aggregated data along with value types.</li>
+      <li><strong>CSV:</strong> Output data in CSV format.</li>
+  </ul>
+
+  <h2>Usage</h2>
+  <ol>
+      <li><strong>Input Parameters:</strong> Provide input parameters for data aggregation.</li>
+      <li><strong>Data Collection:</strong> The node collects the data from the specified sources within the defined time interval and merges them to a time synchronized data array in the <a href="https://docs.openinc.dev/docs/openware/BasicDataFormat">data format</a>.</li>
+      <li><strong>Output:</strong> Receive the aggregated data in the specified format.</li>
+  </ol>
+</script>

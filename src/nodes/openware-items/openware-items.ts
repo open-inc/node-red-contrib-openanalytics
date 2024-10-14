@@ -2,7 +2,7 @@ import { NodeInitializer } from "node-red";
 import { OpenwareItemsNode, OpenwareItemsNodeDef } from "./modules/types";
 import { ConfigNode, ItemMessage, OWItemType } from "../shared/types";
 import { ItemsMsgType } from "./shared/types";
-import { isError } from "../shared/Helper";
+import { isError } from "../shared/helper";
 
 const nodeInit: NodeInitializer = (RED): void => {
   function OpenwareItemsNodeConstructor(
