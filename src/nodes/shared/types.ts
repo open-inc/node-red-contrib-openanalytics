@@ -75,3 +75,17 @@ export type ConfigNode = Node & {
     session: string;
   };
 };
+
+export type MultiSelectPayloadType = {
+  sensorInfos: {
+    source: string;
+    sensor: string;
+    dimension: number;
+  }[];
+  start: number;
+  end: number;
+};
+
+export type PipePayloadType = {
+  pipe: any;
+};
