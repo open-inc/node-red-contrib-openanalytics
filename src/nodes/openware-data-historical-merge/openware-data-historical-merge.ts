@@ -1,7 +1,6 @@
 import { NodeInitializer } from "node-red";
 import { OpenwareDataHistoricalMergeNode, OpenwareDataHistoricalMergeNodeDef } from "./modules/types";
-import { ConfigNode } from "../shared/types";
-import { HistoricMergePayloadType, PipePayloadType } from "./shared/types";
+import { ConfigNode, MultiSelectPayloadType, PipePayloadType } from "../shared/types";
 
 const nodeInit: NodeInitializer = (RED): void => {
   function OpenwareDataHistoricalMergeNodeConstructor(
@@ -13,7 +12,6 @@ const nodeInit: NodeInitializer = (RED): void => {
     const node = this;
 
     this.on("input", async function (msg, send, done) {
-      console.log("Historical Merge Node: ", msg);
       if (!server || !server.credentials.session) {
         node.status({
           fill: "red",
@@ -24,9 +22,9 @@ const nodeInit: NodeInitializer = (RED): void => {
       }
 
       if (
-        ((<HistoricMergePayloadType>msg.payload).sensorInfos &&
-          (<HistoricMergePayloadType>msg.payload).start &&
-          (<HistoricMergePayloadType>msg.payload).end) ||
+        ((<MultiSelectPayloadType>msg.payload).sensorInfos &&
+          (<MultiSelectPayloadType>msg.payload).start &&
+          (<MultiSelectPayloadType>msg.payload).end) ||
         (<PipePayloadType>msg.payload).pipe
       ) {
         //@ts-expect-error
@@ -36,7 +34,7 @@ const nodeInit: NodeInitializer = (RED): void => {
               action: "sync_merge",
               params: {
                 items: 
-                  (<HistoricMergePayloadType>msg.payload).sensorInfos.map((info) => {
+                  (<MultiSelectPayloadType>msg.payload).sensorInfos.map((info) => {
                     return {
                       stages: [
                         {
@@ -44,8 +42,8 @@ const nodeInit: NodeInitializer = (RED): void => {
                           params: {
                             source: info.source,
                             id: info.sensor,
-                            start: (<HistoricMergePayloadType>msg.payload).start,
-                            end: (<HistoricMergePayloadType>msg.payload).end,
+                            start: (<MultiSelectPayloadType>msg.payload).start,
+                            end: (<MultiSelectPayloadType>msg.payload).end,
                           }
                         },
                         {
@@ -61,10 +59,9 @@ const nodeInit: NodeInitializer = (RED): void => {
             },
           ],
         };
-        console.log("Pipe: ", JSON.stringify(pipe, null, 2));
+
         node.status({ fill: "blue", shape: "dot", text: "Fetching data..." });
         const data = await server.api.pipe(pipe);
-        console.log(JSON.stringify(data, null, 2));
 
         if (data.status !== "success") {
           node.status({
