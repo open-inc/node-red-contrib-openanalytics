@@ -60,7 +60,6 @@ const nodeInit: NodeInitializer = (RED): void => {
           ],
         };
         const data = await server.api.pipe(pipe);
-        console.log(JSON.stringify(data, null, 2));
         if (data.status !== "success") {
           node.status({
             fill: "red",
