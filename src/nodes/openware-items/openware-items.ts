@@ -2,7 +2,7 @@ import { NodeInitializer } from "node-red";
 import { OpenwareItemsNode, OpenwareItemsNodeDef } from "./modules/types";
 import { ConfigNode, ItemMessage, OWItemType } from "../shared/types";
 import { ItemsMsgType } from "./shared/types";
-import { isError } from "../shared/Helper";
+import { isError } from "../shared/helper";
 
 const nodeInit: NodeInitializer = (RED): void => {
   function OpenwareItemsNodeConstructor(
@@ -44,7 +44,9 @@ const nodeInit: NodeInitializer = (RED): void => {
             return;
           } else {
             //F**K TYPESCRIPT
-            if (isError(result2return)) return;
+            if (isError(result2return)){
+              return;
+            } 
             result2return.items = result2return.items.concat(item.items);
             result2return.payload = result2return.payload.concat(item.payload);
           }
