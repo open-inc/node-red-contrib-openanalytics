@@ -21,7 +21,6 @@ function connect(
   webSocket = new WebSocket(
     `${server.host.replace("http", "ws")}:${server.port}/subscription`
   );
-  console.log("connecting to WebSocket!", webSocket.url);
   webSocket.on("open", () => {
     console.log("Connected to WebSocket");
     node.status({ fill: "blue", shape: "dot", text: "subscribing..." });
