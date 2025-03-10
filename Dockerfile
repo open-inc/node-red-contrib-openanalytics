@@ -28,21 +28,21 @@ RUN npm install -g --unsafe-perm node-red
 # RUN ~/venv/bin/pip3 install ludwig
 
 #RUN npm install -g node-red-contrib-image-output node-red-contrib-image-tools node-red-contrib-teachable-machine node-red-contrib-fs node-red-node-sentiment node-red-contrib-google-translate-extend node-red-contrib-ot-to-status
-RUN npm install -g typescript yarn
+RUN npm install -g typescript pnpm
 
 WORKDIR /root/nodes/
 
 
 COPY package.json ./package.json
-RUN yarn install
+RUN pnpm install
 
 COPY src/ ./src/
 COPY tsconfig.json ./tsconfig.json
-COPY rollup.config.editor.js ./rollup.config.editor.js
+COPY rollup.config.editor.mjs ./rollup.config.editor.mjs
 COPY tsconfig.runtime.json ./tsconfig.runtime.json
 COPY tsconfig.runtime.watch.json ./tsconfig.runtime.watch.json
 
-RUN yarn build
+RUN pnpm build
 
 WORKDIR /root/.node-red/
 RUN npm install /root/nodes
@@ -54,7 +54,7 @@ COPY settings.js /root/.node-red/settings.js
 
 
 
-ENV NODE_RED_ENABLE_PROJECTS true
+ENV NODE_RED_ENABLE_PROJECTS=true
 ENV PATH="/root/venv/bin:${PATH}"
 EXPOSE 1880
 WORKDIR /root/venv/
