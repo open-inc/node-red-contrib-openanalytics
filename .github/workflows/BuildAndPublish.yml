@@ -38,4 +38,6 @@ jobs:
       - name: Build
         run: pnpm run build
       - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_ORG_OPENINC  }}
         run: pnpm run publish
