@@ -48,7 +48,6 @@ RED.nodes.registerType<OpenwareItemMultipleSelectEditorNodeProperties>(
         dimSelect!.innerHTML = dimSelectHTML;
 
         if (setValue) {
-          // @ts-expect-error
           dimSelect!["value"] = this.dims;
         }
       };
@@ -58,13 +57,11 @@ RED.nodes.registerType<OpenwareItemMultipleSelectEditorNodeProperties>(
         const items = (await itemsReq.json()) as OWItemType[];
 
         if (itemsSelect && cItemValues.length > 0) {
-          //@ts-expect-error
           itemsSelect["value"] = cItemValues.map(
             (el) => el.join("---") as string
           );
 
           if (dimSelect) {
-            // @ts-expect-error
             dimSelect["value"] = this.dims;
 
             const selected = items.filter((item) => {
@@ -122,7 +119,6 @@ RED.nodes.registerType<OpenwareItemMultipleSelectEditorNodeProperties>(
 
       const serverSelect = document.getElementById("node-input-server");
       serverSelect?.addEventListener("change", async (event) => {
-        // @ts-expect-error
         this.server = event.target["value"];
         fetchItemAndDims();
       });
