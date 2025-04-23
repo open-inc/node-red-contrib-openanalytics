@@ -20,6 +20,8 @@ jobs:
           NPM_REGISTRY: ${{secrets.OPENINC_NPM_REGISTRY }}
           NPM_TOKEN: ${{secrets.OPENINC_NPM_TOKEN }}
       - uses: pnpm/action-setup@v4
+        with:
+          version: 10
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Bump version & push
