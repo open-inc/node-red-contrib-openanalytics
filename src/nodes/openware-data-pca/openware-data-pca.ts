@@ -1,11 +1,11 @@
 import { NodeInitializer } from "node-red";
-import { OpenwareDataHistoricalMergeNode, OpenwareDataHistoricalMergeNodeDef } from "./modules/types";
+import { OpenwareDataPcaNode, OpenwareDataPcaNodeDef } from "./modules/types";
 import { ConfigNode, MultiSelectPayloadType, PipePayloadType } from "../shared/types";
 
 const nodeInit: NodeInitializer = (RED): void => {
-  function OpenwareDataHistoricalMergeNodeConstructor(
-    this: OpenwareDataHistoricalMergeNode,
-    config: OpenwareDataHistoricalMergeNodeDef
+  function OpenwareDataPcaNodeConstructor(
+    this: OpenwareDataPcaNode,
+    config: OpenwareDataPcaNodeDef
   ): void {
     const server = RED.nodes.getNode(config.server) as ConfigNode;
     RED.nodes.createNode(this, config);
@@ -33,7 +33,7 @@ const nodeInit: NodeInitializer = (RED): void => {
             {
               action: "sync_merge",
               params: {
-                items: 
+                items:
                   (<MultiSelectPayloadType>msg.payload).sensorInfos.map((info) => {
                     return {
                       stages: [
@@ -57,8 +57,21 @@ const nodeInit: NodeInitializer = (RED): void => {
                   }),
               },
             },
+            {
+              action: "de.openinc.owee.transformation.StatisticTransformers",
+              params:{
+                operation: "pca"
+              }
+            }
           ],
         };
+
+        send({
+          payload: {
+            pipe: pipe,
+            server: server,
+          },
+        });
 
         node.status({ fill: "blue", shape: "dot", text: "Fetching data..." });
         const data = await server.api.pipe(pipe);
@@ -108,18 +121,19 @@ const nodeInit: NodeInitializer = (RED): void => {
         send(msg);
         done();
       } else {
-        node.status({
-          fill: "red",
-          shape: "dot",
-          text: "Missing required parameters.",
-        });
-        console.log("Missing required parameters.");
-        console.log(msg.payload);
+          node.status({
+            fill: "red",
+            shape: "dot",
+            text: "Missing required parameters.",
+          });
+          console.log("Missing required parameters.");
+          console.log(msg.payload);
       }
+
     });
   }
 
-  RED.nodes.registerType("openware-data-historical-merge", OpenwareDataHistoricalMergeNodeConstructor);
+  RED.nodes.registerType("openware-data-pca", OpenwareDataPcaNodeConstructor);
 };
 
 export = nodeInit;

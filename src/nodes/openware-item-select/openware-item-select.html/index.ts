@@ -25,7 +25,6 @@ RED.nodes.registerType<OpenwareItemSelectEditorNodeProperties>(
       return this.name || "openware item select";
     },
     oneditprepare: async function () {
-      console.log("On edit prepare");
       const itemsSelect = document.getElementById("node-input-item");
       const cItemValue = this.item.split("---");
       const dimSelect = document.getElementById("node-input-dim");
@@ -100,8 +99,6 @@ RED.nodes.registerType<OpenwareItemSelectEditorNodeProperties>(
 
       const serverSelect = document.getElementById("node-input-server");
       serverSelect?.addEventListener("change", async (event) => {
-        // @ts-expect-error
-        console.log("server change", event.target["value"]);
         // @ts-expect-error
         this.server = event.target["value"];
         fetchItemAndDims();
