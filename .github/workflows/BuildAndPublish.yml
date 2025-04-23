@@ -19,7 +19,7 @@ jobs:
       - uses: open-inc/github-action-npm-login@v1
         env:
           NPM_REGISTRY: ${{secrets.OPENINC_NPM_REGISTRY }}
-          NPM_TOKEN: ${{secrets.OPENINC_NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN_ORG_OPENINC  }}
       - uses: pnpm/action-setup@v4
         with:
           version: 10
