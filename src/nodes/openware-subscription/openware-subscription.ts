@@ -44,6 +44,7 @@ function connect(
   webSocket.on("close", (event: CloseEvent) => {
     console.log("Disconnected from WebSocket", event);
     node.status({ fill: "red", shape: "dot", text: "disconnected." });
+    node.webSocket = null;
   });
   webSocket.on("error", (event: Event) => {
     node.status({
@@ -108,6 +109,22 @@ const nodeInit: NodeInitializer = (RED): void => {
           server,
           msg.payload as string[]
         );
+        setInterval(() => {
+          if (node.webSocket) {
+            node.webSocket.send(
+              JSON.stringify({
+                action: "ping",
+              })
+            );
+          } else {
+            node.webSocket = connect(
+              node.webSocket,
+              node,
+              server,
+              msg.payload as string[]
+            );
+          }
+        }, 60 * 1000);
       } else {
         node.status({ fill: "red", shape: "dot", text: "disconnected." });
       }
