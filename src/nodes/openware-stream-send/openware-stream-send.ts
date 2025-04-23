@@ -83,7 +83,8 @@ const nodeInit: NodeInitializer = (RED): void => {
         !msg.payload.values
       ) {
         node.error({
-          error: "No or wrong data in msg.payload",
+          error:
+            "No or wrong data in msg.payload. Payload must be an object with id, name, source, valueTypes and values.",
         });
         return;
       }

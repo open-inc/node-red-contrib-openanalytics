@@ -28,33 +28,40 @@ RED.nodes.registerType<OpenwareItemSelectEditorNodeProperties>(
       const itemsSelect = document.getElementById("node-input-item");
       const cItemValue = this.item.split("---");
       const dimSelect = document.getElementById("node-input-dim");
-      const setDimSelectFromSelectedItem = (selectedItem: OWItemType, setValue: boolean) => {
+      const setDimSelectFromSelectedItem = (
+        selectedItem: OWItemType,
+        setValue: boolean
+      ) => {
         if (dimSelect) {
           dimSelect!.innerHTML = selectedItem.valueTypes
-          .map((dim, index) => {
-            return `<sl-option value="${index}">${dim.name}</sl-option>`;
-          })
-          .join("\n");
+            .map((dim, index) => {
+              return `<sl-option value="${index}">${dim.name}</sl-option>`;
+            })
+            .join("\n");
           if (setValue) {
+            // @ts-expect-error
             dimSelect!["value"] = this.dim;
           }
         }
-      }
+      };
 
       const fetchItemAndDims = async () => {
-        const itemsReq = await fetch(`/openware/itemselect/${this.server}`);
+        const itemsReq = await fetch(`openware/itemselect/${this.server}`);
         const items = (await itemsReq.json()) as OWItemType[];
-        
+
         // If the config is reopened then we need to set the value of the select for input and dimension:
         if (itemsSelect && cItemValue.length === 2) {
+          // @ts-expect-error
           itemsSelect["value"] = cItemValue.join("---") as string;
           if (dimSelect) {
+            // @ts-expect-error
             dimSelect["value"] =
               //@ts-expect-error
               this.dim instanceof Number ? this.dim : parseInt(this.dim);
 
             const selected = items.find(
-              (item) => item.id === cItemValue[1] && item.source === cItemValue[0]
+              (item) =>
+                item.id === cItemValue[1] && item.source === cItemValue[0]
             );
             if (selected) {
               setDimSelectFromSelectedItem(selected, true);
@@ -84,14 +91,15 @@ RED.nodes.registerType<OpenwareItemSelectEditorNodeProperties>(
           }
           setDimSelectFromSelectedItem(selected, false);
         });
-      }
-      
+      };
+
       if (this.server !== "") {
-        fetchItemAndDims()
+        fetchItemAndDims();
       }
-      
+
       const serverSelect = document.getElementById("node-input-server");
       serverSelect?.addEventListener("change", async (event) => {
+        // @ts-expect-error
         this.server = event.target["value"];
         fetchItemAndDims();
       });

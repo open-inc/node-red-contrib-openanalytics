@@ -1,0 +1,38 @@
+name: Build & Publish
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: open-inc/github-action-npm-login@v1
+        env:
+          NPM_REGISTRY: ${{secrets.OPENINC_NPM_REGISTRY }}
+          NPM_TOKEN: ${{secrets.OPENINC_NPM_TOKEN }}
+      - uses: pnpm/action-setup@v4
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Bump version & push
+        run: |
+          git config --global user.name 'Automated publish'
+          git config --global user.email 'stein@openinc.de'
+
+          # Update the version in package.json, and commit & tag the change:
+          npm version patch # YMMV - you might want the semver level as a workflow input
+
+          git push && git push --tags
+
+      - name: Build
+        run: pnpm run build  
+      - name: Publish
+        run: pnpm run publish
