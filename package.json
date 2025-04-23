@@ -13,7 +13,7 @@
     "dev": "rimraf  dist && npm run copy && concurrently --kill-others --names 'COPY,EDITOR,RUNTIME,TEST' --prefix '({name})' --prefix-colors 'yellow.bold,cyan.bold,greenBright.bold,magenta.bold' 'onchange -v \"src/**/*.png\" \"src/**/*.svg\" -- npm run copy' 'npm run build:editor:watch' 'npm run build:runtime:watch' 'sleep 10; npm run test:watch'",
     "lint": "prettier --ignore-path .eslintignore --check '**/*.{js,ts,md}'; eslint --ext .js,.ts .",
     "lint:fix": "prettier --ignore-path .eslintignore --write '**/*.{js,ts,md}'; eslint --ext .js,.ts . --fix",
-    "publish": "npm publish --access public"
+    "publishToNPM": "npm publish --access public"
   },
   "author": "Martin Stein",
   "keywords": [
