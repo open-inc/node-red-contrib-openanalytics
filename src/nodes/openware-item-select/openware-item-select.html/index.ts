@@ -40,6 +40,7 @@ RED.nodes.registerType<OpenwareItemSelectEditorNodeProperties>(
             })
             .join("\n");
           if (setValue) {
+            // @ts-expect-error
             dimSelect!["value"] = this.dim;
           }
         }
@@ -51,8 +52,10 @@ RED.nodes.registerType<OpenwareItemSelectEditorNodeProperties>(
 
         // If the config is reopened then we need to set the value of the select for input and dimension:
         if (itemsSelect && cItemValue.length === 2) {
+          // @ts-expect-error
           itemsSelect["value"] = cItemValue.join("---") as string;
           if (dimSelect) {
+            // @ts-expect-error
             dimSelect["value"] =
               //@ts-expect-error
               this.dim instanceof Number ? this.dim : parseInt(this.dim);
@@ -97,7 +100,9 @@ RED.nodes.registerType<OpenwareItemSelectEditorNodeProperties>(
 
       const serverSelect = document.getElementById("node-input-server");
       serverSelect?.addEventListener("change", async (event) => {
+        // @ts-expect-error
         console.log("server change", event.target["value"]);
+        // @ts-expect-error
         this.server = event.target["value"];
         fetchItemAndDims();
       });
