@@ -15,6 +15,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          registry-url: "https://registry.npmjs.org"
       - uses: open-inc/github-action-npm-login@v1
         env:
           NPM_REGISTRY: ${{secrets.OPENINC_NPM_REGISTRY }}
@@ -35,6 +36,6 @@ jobs:
           git push && git push --tags
 
       - name: Build
-        run: pnpm run build  
+        run: pnpm run build
       - name: Publish
         run: pnpm run publish
