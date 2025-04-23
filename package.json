@@ -1,6 +1,6 @@
 {
   "name": "@openinc/node-red-contrib-openware",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Nodes to access a open.WARE Middleware by open.INC",
   "scripts": {
     "add-node": "node ./utils/add-node.js",
