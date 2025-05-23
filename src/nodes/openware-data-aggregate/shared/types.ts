@@ -1,5 +1,4 @@
-import { NodeMessageInFlow } from "node-red";
-import { HistoricalMsgPayloadType } from "src/nodes/openware-data-historical/shared/types";
+import { HistoricalMsgPayloadType } from "../../openware-data-historical/shared/types";
 type operation =
   | "sum"
   | "mean"
