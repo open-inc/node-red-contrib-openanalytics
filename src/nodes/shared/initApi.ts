@@ -2,15 +2,19 @@ import {
   ConfigNode,
   DataItemMessage,
   ItemMessage,
+  SentMessage,
   SourceMessage,
+  WSSubscription,
 } from "./types";
 import { errorType, OWItemType } from "./types";
-
+import { connect } from "./connectWS";
+import { WebSocket } from "ws";
 export async function initApi(node: ConfigNode) {
   console.log("-".repeat(20), "Setting up open.WARE API", "-".repeat(20));
   console.log("Host:", node.host + ":" + node.port);
   console.log("-".repeat(50));
   let f = fetch;
+  node.subscriptions = {};
   const items = async (source?: string | undefined) => {
     let resp;
     let text;
@@ -42,6 +46,7 @@ export async function initApi(node: ConfigNode) {
         payload: result,
       } as ItemMessage;
     } catch (e) {
+      console.error("Error fetching items", e);
       return {
         status: "error",
         payload: { error: e, response: text },
@@ -179,6 +184,48 @@ export async function initApi(node: ConfigNode) {
       return { error: e, response: text, url };
     }
   };
+  const sendStream = (
+    data: OWItemType,
+    mode: "update" | "push"
+  ): SentMessage => {
+    if (node.credentials.session) {
+      if (node.webSocket && node.webSocket.readyState === WebSocket.OPEN) {
+        const message = JSON.stringify({
+          action: mode,
+          items: [data],
+          session: node.credentials.session,
+        });
+        node.webSocket.send(message);
+        return {
+          status: "success",
+          payload: data,
+        } as SentMessage;
+      } else {
+        return {
+          status: "error",
+          payload: { error: "WebSocket not connected" } as errorType,
+        };
+      }
+    } else {
+      return {
+        status: "error",
+        payload: { error: "not logged in" } as errorType,
+      };
+    }
+  };
+  const addSubscription = (sub: WSSubscription) => {
+    const id = "ID_" + Math.random().toString(16);
+    node.subscriptions[id] = sub;
+    console.log("Subscriptions", node.subscriptions);
+    return () => {
+      delete node.subscriptions[id];
+    };
+  };
+  const destroy = () => {
+    if (node.keepAlive) clearInterval(node.keepAlive);
+    if (node.webSocket) node.webSocket.close();
+    node.webSocket = null;
+  };
 
   node.api = {
     items,
@@ -187,5 +234,9 @@ export async function initApi(node: ConfigNode) {
     live,
     pipe,
     send,
+    sendStream,
+    addSubscription,
+    destroy,
   };
+  connect(node);
 }

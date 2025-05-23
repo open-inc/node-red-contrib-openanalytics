@@ -10,6 +10,10 @@ const nodeInit: NodeInitializer = (RED): void => {
     this.host = config.host;
     this.port = config.port;
     initApi(this);
+    this.on("close", () => {
+      console.log("Closing API....");
+      this.api.destroy();
+    });
   }
 
   RED.nodes.registerType("openware-config", OpenwareConfigNodeConstructor, {

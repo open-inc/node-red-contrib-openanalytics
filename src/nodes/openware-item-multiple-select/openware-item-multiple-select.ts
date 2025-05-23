@@ -1,5 +1,9 @@
 import { NodeInitializer } from "node-red";
-import { OpenwareItemMultipleSelectNode, OpenwareItemMultipleSelectNodeDef } from "./modules/types";
+import {
+  OpenwareItemMultipleSelectNode,
+  OpenwareItemMultipleSelectNodeDef,
+} from "./modules/types";
+import { MultiSelectPayloadType } from "../shared/types";
 
 const nodeInit: NodeInitializer = (RED): void => {
   function OpenwareItemMultipleSelectNodeConstructor(
@@ -9,10 +13,13 @@ const nodeInit: NodeInitializer = (RED): void => {
     RED.nodes.createNode(this, config);
 
     this.on("input", (msg: any, send, done) => {
-      const items = config.items.length > 0 ? config.items.map(el => el.split("---")) : [];
+      const items =
+        config.items.length > 0
+          ? config.items.map((el) => el.split("---"))
+          : [];
       const dims = config.dims.length > 0 ? config.dims : [];
 
-      const sensorInfos = dims.map((dim) => {
+      let sensorInfos = dims.map((dim) => {
         const dimInfo = dim.split("---");
         if (dimInfo.length !== 3) {
           RED.log.error("Invalid dimension configuration");
@@ -23,9 +30,10 @@ const nodeInit: NodeInitializer = (RED): void => {
         return {
           source: dimInfo[0],
           sensor: dimInfo[1],
-          dimension: dimInfo[2],
-        };
-      })
+          dimension: parseInt(dimInfo[2]),
+        } as MultiSelectPayloadType["sensorInfos"][number];
+      });
+
       for (const item of items) {
         if (item.length !== 2) {
           RED.log.error("Invalid item configuration");
@@ -33,19 +41,36 @@ const nodeInit: NodeInitializer = (RED): void => {
           return;
         }
       }
-      if (!msg.payload || typeof msg.payload !== "object") {
-        msg.payload = {} as any;
-      }
-      msg.payload.sensorInfos = msg.payload.sensorInfos ?? sensorInfos;
-      msg.payload.start = msg.payload.start ?? new Date(config.start).getTime();
-      msg.payload.end = msg.payload.end ?? new Date(config.end).getTime();
 
+      if (sensorInfos.length === 0) {
+        sensorInfos = items.map((item) => {
+          return {
+            source: item[0],
+            sensor: item[1],
+          };
+        });
+      }
+
+      if (!msg.query || typeof msg.query !== "object") {
+        msg.query = {};
+      }
+      console.log("start", config.start);
+      console.log("end", config.end);
+      msg.query.sensorInfos = msg.query.sensorInfos ?? sensorInfos;
+      msg.query.start = msg.query.start ?? new Date(config.start).getTime();
+      msg.query.end = msg.query.end ?? new Date(config.end).getTime();
+      console.log("msg.query:", msg.query);
+      console.log("sensorInfos:", sensorInfos);
+      console.log("items:", items);
       send(msg);
       done();
     });
   }
 
-  RED.nodes.registerType("openware-item-multiple-select", OpenwareItemMultipleSelectNodeConstructor);
+  RED.nodes.registerType(
+    "openware-item-multiple-select",
+    OpenwareItemMultipleSelectNodeConstructor
+  );
 };
 
 export = nodeInit;

@@ -8,8 +8,16 @@ export interface OpenwareDataHistoricalOptions {
 }
 
 export type HistoricalMsgPayloadType = NodeMessageInFlow & {
-  source: string;
-  sensor: string;
-  start: number;
-  end: number;
+  amount?: number;
+  date?: number;
+
+  query?: {
+    sensorInfos: {
+      source: string;
+      sensor: string;
+      dimension?: number;
+    }[];
+    start: number;
+    end: number;
+  };
 };

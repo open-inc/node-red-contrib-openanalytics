@@ -1,49 +1,80 @@
 <script type="text/html" data-help-name="openware-data-aggregate">
-
   <h2>Introduction</h2>
-  <p>The OpenWARE Data Aggregate Time node aggregates sensor data over a specified time interval from an OpenWARE server.</p>
+  <p>
+    The OpenWARE Data Aggregate Time node aggregates sensor data over a
+    specified time interval from an OpenWARE server.
+  </p>
 
   <h2>Configuration</h2>
   <ul>
-      <li><strong>Server:</strong> The OpenWARE server configuration to use for data aggregation.</li>
-      <li><strong>Interval:</strong> The time interval for data aggregation (e.g., "day", "hour", "minute").</li>
-      <li><strong>Output Format:</strong> Specifies the format for output data (JSON, VALUES_ONLY, CSV).</li>
-      <li><strong>Delimiter:</strong> (For CSV output) The delimiter to use for CSV formatting.</li>
+    <li>
+      <strong>Server:</strong> The OpenWARE server configuration to use for data
+      aggregation.
+    </li>
+    <li>
+      <strong>Interval:</strong> The time interval for data aggregation (e.g.,
+      "day", "hour", "minute").
+    </li>
+    <li>
+      <strong>Output Format:</strong> Specifies the format for output data
+      (JSON, VALUES_ONLY, CSV).
+    </li>
+    <li>
+      <strong>Delimiter:</strong> (For CSV output) The delimiter to use for CSV
+      formatting.
+    </li>
   </ul>
 
   <h2>Input</h2>
-  <p>The node expects input messages containing parameters for data aggregation:</p>
+  <p>
+    The node expects input messages containing parameters for data aggregation
+    in msg.query:
+  </p>
   <ul>
-      <li><strong>source:</strong> The source of the data.</li>
-      <li><strong>sensor:</strong> The sensor ID.</li>
-      <li><strong>start:</strong> The start date/time for the data aggregation.</li>
-      <li><strong>end:</strong> The end date/time for the data aggregation.</li>
-      <li><strong>pipe:</strong> (Optional) Custom data aggregation pipeline.</li>
+    <li>
+      <strong>sensorInfos:</strong> Object containig 'source'as string and
+      'sensor' as string and optionally an 'dimension' as number
+    </li>
+    <li>
+      <strong>start:</strong> The start date/time for the data aggregation.
+    </li>
+    <li><strong>end:</strong> The end date/time for the data aggregation.</li>
+    <li><strong>pipe:</strong> (Optional) Custom data aggregation pipeline.</li>
   </ul>
 
   <h2>Output</h2>
   <p>The node sends aggregated data in the specified format:</p>
   <ul>
-      <li><strong>JSON:</strong> Output data in JSON format.</li>
-      <li><strong>VALUES_ONLY:</strong> Output only the values of aggregated data along with value types.</li>
-      <li><strong>CSV:</strong> Output data in CSV format.</li>
+    <li><strong>JSON:</strong> Output data in JSON format.</li>
+    <li>
+      <strong>VALUES_ONLY:</strong> Output only the values of aggregated data
+      along with value types.
+    </li>
+    <li><strong>CSV:</strong> Output data in CSV format.</li>
   </ul>
 
   <h2>Usage</h2>
   <ol>
-      <li><strong>Input Parameters:</strong> Provide input parameters for data aggregation.</li>
-      <li><strong>Data Aggregation:</strong> The node aggregates data from the specified source within the defined time interval.</li>
-      <li><strong>Output:</strong> Receive the aggregated data in the specified format.</li>
+    <li>
+      <strong>Input Parameters:</strong> Provide input parameters for data
+      aggregation.
+    </li>
+    <li>
+      <strong>Data Aggregation:</strong> The node aggregates data from the
+      specified source within the defined time interval.
+    </li>
+    <li>
+      <strong>Output:</strong> Receive the aggregated data in the specified
+      format.
+    </li>
   </ol>
 
   <h2>Example Flow</h2>
   <pre><code>
       <!-- Insert Example Flow JSON here -->
   </code></pre>
-  
+
   <footer>
-      <p>For more information, refer to the OpenWARE documentation.</p>
+    <p>For more information, refer to the OpenWARE documentation.</p>
   </footer>
-
-
 </script>

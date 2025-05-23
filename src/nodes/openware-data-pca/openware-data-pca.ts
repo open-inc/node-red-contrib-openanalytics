@@ -1,6 +1,10 @@
 import { NodeInitializer } from "node-red";
 import { OpenwareDataPcaNode, OpenwareDataPcaNodeDef } from "./modules/types";
-import { ConfigNode, MultiSelectPayloadType, PipePayloadType } from "../shared/types";
+import {
+  ConfigNode,
+  MultiSelectPayloadType,
+  PipePayloadType,
+} from "../shared/types";
 
 const nodeInit: NodeInitializer = (RED): void => {
   function OpenwareDataPcaNodeConstructor(
@@ -22,9 +26,9 @@ const nodeInit: NodeInitializer = (RED): void => {
       }
 
       if (
-        ((<MultiSelectPayloadType>msg.payload).sensorInfos &&
-          (<MultiSelectPayloadType>msg.payload).start &&
-          (<MultiSelectPayloadType>msg.payload).end) ||
+        ((<MultiSelectPayloadType>msg.query)?.sensorInfos &&
+          (<MultiSelectPayloadType>msg.query)?.start &&
+          (<MultiSelectPayloadType>msg.query)?.end) ||
         (<PipePayloadType>msg.payload).pipe
       ) {
         //@ts-expect-error
@@ -33,8 +37,8 @@ const nodeInit: NodeInitializer = (RED): void => {
             {
               action: "sync_merge",
               params: {
-                items:
-                  (<MultiSelectPayloadType>msg.payload).sensorInfos.map((info) => {
+                items: (<MultiSelectPayloadType>msg.query)?.sensorInfos.map(
+                  (info) => {
                     return {
                       stages: [
                         {
@@ -42,36 +46,38 @@ const nodeInit: NodeInitializer = (RED): void => {
                           params: {
                             source: info.source,
                             id: info.sensor,
-                            start: (<MultiSelectPayloadType>msg.payload).start,
-                            end: (<MultiSelectPayloadType>msg.payload).end,
-                          }
+                            start: (<MultiSelectPayloadType>msg.query)?.start,
+                            end: (<MultiSelectPayloadType>msg.query)?.end,
+                          },
                         },
                         {
                           action: "dimension_reduce",
                           params: {
-                            dimension: info.dimension
-                          }
-                        }
-                      ]
-                    }
-                  }),
+                            dimension: info.dimension,
+                          },
+                        },
+                      ],
+                    };
+                  }
+                ),
               },
             },
             {
               action: "de.openinc.owee.transformation.StatisticTransformers",
-              params:{
-                operation: "pca"
-              }
-            }
+              params: {
+                operation: "pca",
+              },
+            },
           ],
         };
 
-        send({
-          payload: {
-            pipe: pipe,
-            server: server,
-          },
-        });
+        // send({
+        //   ...msg,
+        //   payload: {
+        //     pipe: pipe,
+        //     server: server,
+        //   },
+        // });
 
         node.status({ fill: "blue", shape: "dot", text: "Fetching data..." });
         const data = await server.api.pipe(pipe);
@@ -87,13 +93,13 @@ const nodeInit: NodeInitializer = (RED): void => {
         }
         node.status({});
         if (config.output === "JSON") {
-          node.send(data);
+          node.send({ ...msg, ...data });
           return;
         }
         if (config.output === "VALUES_ONLY") {
           node.send({
+            ...msg,
             payload: data.item.values,
-            //@ts-expect-error
             valueTypes: data.item.valueTypes,
             request: msg.payload,
           });
@@ -115,21 +121,19 @@ const nodeInit: NodeInitializer = (RED): void => {
             )
           );
 
-          node.send(Object.assign(data, { payload: csvData.join("\n") }));
+          node.send({ ...msg, ...data, payload: csvData.join("\n") });
           return;
         }
-        send(msg);
         done();
       } else {
-          node.status({
-            fill: "red",
-            shape: "dot",
-            text: "Missing required parameters.",
-          });
-          console.log("Missing required parameters.");
-          console.log(msg.payload);
+        node.status({
+          fill: "red",
+          shape: "dot",
+          text: "Missing required parameters.",
+        });
+        console.log("Missing required parameters.");
+        console.log(msg.payload);
       }
-
     });
   }
 

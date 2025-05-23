@@ -1,6 +1,13 @@
 import { NodeInitializer } from "node-red";
-import { OpenwareDataHistoricalMergeNode, OpenwareDataHistoricalMergeNodeDef } from "./modules/types";
-import { ConfigNode, MultiSelectPayloadType, PipePayloadType } from "../shared/types";
+import {
+  OpenwareDataHistoricalMergeNode,
+  OpenwareDataHistoricalMergeNodeDef,
+} from "./modules/types";
+import {
+  ConfigNode,
+  MultiSelectPayloadType,
+  PipePayloadType,
+} from "../shared/types";
 
 const nodeInit: NodeInitializer = (RED): void => {
   function OpenwareDataHistoricalMergeNodeConstructor(
@@ -22,19 +29,19 @@ const nodeInit: NodeInitializer = (RED): void => {
       }
 
       if (
-        ((<MultiSelectPayloadType>msg.payload).sensorInfos &&
-          (<MultiSelectPayloadType>msg.payload).start &&
-          (<MultiSelectPayloadType>msg.payload).end) ||
-        (<PipePayloadType>msg.payload).pipe
+        ((<MultiSelectPayloadType>msg.query)?.sensorInfos &&
+          (<MultiSelectPayloadType>msg.query)?.start &&
+          (<MultiSelectPayloadType>msg.query)?.end) ||
+        (<PipePayloadType>msg.query).pipe
       ) {
         //@ts-expect-error
-        const pipe = msg.payload.pipe || {
+        const pipe = msg.query.pipe || {
           stages: [
             {
               action: "sync_merge",
               params: {
-                items: 
-                  (<MultiSelectPayloadType>msg.payload).sensorInfos.map((info) => {
+                items: (<MultiSelectPayloadType>msg.query)?.sensorInfos.map(
+                  (info) => {
                     return {
                       stages: [
                         {
@@ -42,19 +49,20 @@ const nodeInit: NodeInitializer = (RED): void => {
                           params: {
                             source: info.source,
                             id: info.sensor,
-                            start: (<MultiSelectPayloadType>msg.payload).start,
-                            end: (<MultiSelectPayloadType>msg.payload).end,
-                          }
+                            start: (<MultiSelectPayloadType>msg.query)?.start,
+                            end: (<MultiSelectPayloadType>msg.query)?.end,
+                          },
                         },
                         {
                           action: "dimension_reduce",
                           params: {
-                            dimension: info.dimension
-                          }
-                        }
-                      ]
-                    }
-                  }),
+                            dimension: info.dimension,
+                          },
+                        },
+                      ],
+                    };
+                  }
+                ),
               },
             },
           ],
@@ -74,13 +82,13 @@ const nodeInit: NodeInitializer = (RED): void => {
         }
         node.status({});
         if (config.output === "JSON") {
-          node.send(data);
+          node.send({ ...msg, ...data });
           return;
         }
         if (config.output === "VALUES_ONLY") {
           node.send({
+            ...msg,
             payload: data.item.values,
-            //@ts-expect-error
             valueTypes: data.item.valueTypes,
             request: msg.payload,
           });
@@ -102,10 +110,10 @@ const nodeInit: NodeInitializer = (RED): void => {
             )
           );
 
-          node.send(Object.assign(data, { payload: csvData.join("\n") }));
+          node.send({ ...msg, ...data, payload: csvData.join("\n") });
           return;
         }
-        send(msg);
+
         done();
       } else {
         node.status({
@@ -119,7 +127,10 @@ const nodeInit: NodeInitializer = (RED): void => {
     });
   }
 
-  RED.nodes.registerType("openware-data-historical-merge", OpenwareDataHistoricalMergeNodeConstructor);
+  RED.nodes.registerType(
+    "openware-data-historical-merge",
+    OpenwareDataHistoricalMergeNodeConstructor
+  );
 };
 
 export = nodeInit;

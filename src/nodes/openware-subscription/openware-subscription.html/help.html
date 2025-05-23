@@ -3,30 +3,30 @@
   <p>The open.WARE node allows you to connect to an Open.WARE server via WebSocket and subscribe to real-time data updates.</p>
 
   <h2>Node Configuration</h2>
-  
+
   <ul>
     <li><strong>Server:</strong> Select the Open.WARE server configuration node that this node will use to connect to the Open.WARE server.</li>
   </ul>
-  
+
   <h2>Input</h2>
-  
-  <p>This node expects message payload containing an array of data sources to subscribe to. Each data source should be a string such as <pre>msg.payload = ["source1", "source2"]</pre></p>
-  
+
+  <p>This node expects <code>msg.query</code> containing an array of sensorInfos to subscribe to. Each sensorInfo entry should be an object such as <code>{source:"source1", sensor:"sensor1"}</code></p>
+
   <h2>Status</h2>
-  
+
   <ul>
     <li><strong>Disconnected:</strong> Indicates that the node is not connected to an Open.WARE server.</li>
     <li><strong>Subscribing:</strong> Indicates that the node is in the process of subscribing to data updates.</li>
     <li><strong>Connected:</strong> Indicates that the node is connected to the Open.WARE server and receiving data updates.</li>
     <li><strong>Error:</strong> Indicates that an error occurred with the WebSocket connection.</li>
   </ul>
-  
+
   <h2>Disconnect</h2>
-  
+
   <p>To cancel the subscription, send a message with <pre>msg.disconnect = true</pre> to the node.</p>
-  
+
   <h2>Example Usage</h2>
-  
+
   <ol>
     <li>Configure the "Server" parameter by selecting an Open.WARE server configuration node.</li>
     <li>Inject an array of data sources into the node's input.</li>
@@ -34,4 +34,4 @@
     <li>The node will establish a WebSocket connection to the Open.WARE server and subscribe to the specified data sources.</li>
     <li>Received data updates will be sent to downstream nodes in the flow.</li>
   </ol>
-  </script>
+</script>

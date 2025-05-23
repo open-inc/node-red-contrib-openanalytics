@@ -19,14 +19,20 @@ const nodeInit: NodeInitializer = (RED): void => {
         this.debug("Invalid item configuration");
         return;
       }
-      if (!msg.payload || typeof msg.payload !== "object") {
-        msg.payload = {} as any;
+      if (
+        !msg.query ||
+        typeof msg.query !== "object" ||
+        !msg.query.sensorInfos ||
+        typeof msg.query.sensorInfos !== "object"
+      ) {
+        msg.query = { sensorInfos: {} };
       }
-      msg.payload.sensor = msg.payload.sensor || item[1];
-      msg.payload.source = msg.payload.source || item[0];
-      msg.payload.dimension = msg.payload.dimension ?? parseInt(config.dim);
-      msg.payload.start = msg.payload.start ?? new Date(config.start).getTime();
-      msg.payload.end = msg.payload.end ?? new Date(config.end).getTime();
+      msg.query.sensorInfos.sensor = msg.query.sensorInfos.sensor || item[1];
+      msg.query.sensorInfos.source = msg.query.sensorInfos.source || item[0];
+      msg.query.sensorInfos.dimension =
+        msg.query.sensorInfos.dimension ?? parseInt(config.dim);
+      msg.query.start = msg.query.start ?? new Date(config.start).getTime();
+      msg.query.end = msg.query.end ?? new Date(config.end).getTime();
 
       send(msg);
       done();

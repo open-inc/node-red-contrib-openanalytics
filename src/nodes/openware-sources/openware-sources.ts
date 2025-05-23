@@ -8,7 +8,6 @@ const nodeInit: NodeInitializer = (RED): void => {
     config: OpenwareSourcesNodeDef
   ): void {
     const server = RED.nodes.getNode(config.server) as ConfigNode;
-    console.log("Server", server);
     RED.nodes.createNode(this, config);
     const node = this;
     node.on("input", async function (msg: NodeMessage) {
@@ -35,7 +34,7 @@ const nodeInit: NodeInitializer = (RED): void => {
       } else {
         node.status({});
       }
-      node.send(sources);
+      node.send({ ...msg, ...sources });
     });
   }
 

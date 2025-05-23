@@ -3,6 +3,7 @@ import { OpenwareItemsNode, OpenwareItemsNodeDef } from "./modules/types";
 import { ConfigNode, ItemMessage, OWItemType } from "../shared/types";
 import { ItemsMsgType } from "./shared/types";
 import { isError } from "../shared/helper";
+import { stringify } from "querystring";
 
 const nodeInit: NodeInitializer = (RED): void => {
   function OpenwareItemsNodeConstructor(
@@ -12,8 +13,6 @@ const nodeInit: NodeInitializer = (RED): void => {
     const server = RED.nodes.getNode(config.server) as ConfigNode;
     RED.nodes.createNode(this, config);
     const node = this;
-    if (server && server.credentials.session) {
-    }
 
     node.on("input", async function (msg: ItemsMsgType) {
       if (!server || !server.credentials.session) {
@@ -28,8 +27,21 @@ const nodeInit: NodeInitializer = (RED): void => {
         node.status({});
       }
 
-      if (msg.sources) {
-        const reqs = msg.sources.map((source) => server.api.items(source));
+      if (
+        (msg.payload &&
+          typeof msg.payload === "object" &&
+          length in msg.payload) ||
+        msg?.query?.sensorInfos
+      ) {
+        let sources = [];
+        if (msg?.query) {
+          sources = msg.query.sensorInfos.map((info) => info.source);
+        } else {
+          sources = (msg.payload as any[]).map(
+            (source) => "" + (source ? source : "")
+          ) as string[];
+        }
+        const reqs = sources.map((source) => server.api.items(source));
 
         const items = await Promise.all(reqs);
         const result2return = {
@@ -44,21 +56,21 @@ const nodeInit: NodeInitializer = (RED): void => {
             return;
           } else {
             //F**K TYPESCRIPT
-            if (isError(result2return)){
+            if (isError(result2return)) {
               return;
-            } 
+            }
             result2return.items = result2return.items.concat(item.items);
             result2return.payload = result2return.payload.concat(item.payload);
           }
         }
 
-        node.send(result2return);
+        node.send({ ...msg, ...result2return });
       } else {
         const items = await server.api.items();
         if (items.status === "error") {
           node.error(items);
         }
-        node.send(items);
+        node.send({ ...msg, ...items });
       }
     });
   }

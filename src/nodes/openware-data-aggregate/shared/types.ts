@@ -1,5 +1,5 @@
 import { NodeMessageInFlow } from "node-red";
-
+import { HistoricalMsgPayloadType } from "src/nodes/openware-data-historical/shared/types";
 type operation =
   | "sum"
   | "mean"
@@ -27,16 +27,8 @@ export interface OpenwareDataAggregateOptions {
 }
 
 export type PipePayloadType = {
-  pipe: any;
+  pipe?: any[];
 };
-export type HistoricPayloadType = {
-  source: string;
-  sensor: string;
-  start: number;
-  end: number;
-  operation: operation;
-  interval: interval;
-  dimension: number;
-};
-export type AggregateMsgPayloadType = NodeMessageInFlow &
-  (PipePayloadType | HistoricPayloadType);
+
+export type AggregateMsgPayloadType = PipePayloadType &
+  HistoricalMsgPayloadType;

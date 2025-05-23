@@ -1,14 +1,10 @@
-import { NodeInitializer, NodeMessageInFlow } from "node-red";
+import { NodeInitializer } from "node-red";
 import {
   OpenwareDataAggregateNode,
   OpenwareDataAggregateNodeDef,
 } from "./modules/types";
 import { ConfigNode, OWItemType, errorType } from "../shared/types";
-import {
-  AggregateMsgPayloadType,
-  HistoricPayloadType,
-  PipePayloadType,
-} from "./shared/types";
+import { AggregateMsgPayloadType } from "./shared/types";
 
 const nodeInit: NodeInitializer = (RED): void => {
   function OpenwareDataAggregateNodeConstructor(
@@ -19,7 +15,7 @@ const nodeInit: NodeInitializer = (RED): void => {
     RED.nodes.createNode(this, config);
     const node = this;
 
-    node.on("input", async function (msg) {
+    node.on("input", async function (msg: AggregateMsgPayloadType) {
       if (!server || !server.credentials.session) {
         node.status({
           fill: "red",
@@ -29,32 +25,32 @@ const nodeInit: NodeInitializer = (RED): void => {
         return;
       }
 
-      if (
-        ((<HistoricPayloadType>msg.payload).source &&
-          (<HistoricPayloadType>msg.payload).sensor &&
-          (<HistoricPayloadType>msg.payload).start &&
-          (<HistoricPayloadType>msg.payload).end) ||
-        (<PipePayloadType>msg.payload).pipe
-      ) {
-        //@ts-expect-error
-        const pipe = msg.payload.pipe || {
+      if (!msg.query && !msg.pipe) {
+        node.status({
+          fill: "red",
+          shape: "dot",
+          text: "Please provide a msg.query or msg.pipe",
+        });
+        return;
+      }
+
+      const maxIndex =
+        "pipe" in msg ? msg.pipe!.length : msg.query!.sensorInfos.length;
+
+      const response = [];
+      for (let i = 0; i < maxIndex; i++) {
+        const pipe = msg.pipe || {
           stages: [
             {
               action: "source_aggregation",
               params: {
-                operation:
-                  (<HistoricPayloadType>msg.payload).operation ||
-                  config.operation ||
-                  "mean",
-                dimension: (<HistoricPayloadType>msg.payload).dimension || 0,
-                timeinterval:
-                  (<HistoricPayloadType>msg.payload).interval ||
-                  config.interval ||
-                  "day",
-                start: (<HistoricPayloadType>msg.payload).start,
-                end: (<HistoricPayloadType>msg.payload).end,
-                source: (<HistoricPayloadType>msg.payload).source,
-                id: (<HistoricPayloadType>msg.payload).sensor,
+                operation: config.operation || "mean",
+                source: msg.query?.sensorInfos[i].source,
+                id: msg.query?.sensorInfos[i].sensor,
+                dimension: msg.query?.sensorInfos[i].dimension ?? 0,
+                timeinterval: config.interval || "day",
+                start: msg.query?.start,
+                end: msg.query?.end,
               },
             },
           ],
@@ -66,48 +62,58 @@ const nodeInit: NodeInitializer = (RED): void => {
             shape: "dot",
             text: "Error fetching data." + data.payload.error,
           });
-          node.error(data);
-          return;
+        } else {
+          node.status({});
         }
-        node.status({});
-        if (config.output === "JSON") {
-          node.send(data);
-          return;
-        }
-        if (config.output === "VALUES_ONLY") {
-          node.send({
-            payload: data.item.values,
-            //@ts-expect-error
-            valueTypes: data.item.valueTypes,
-            request: msg.payload,
-          });
-          return;
-        }
-        if (config.output === "CSV") {
-          const csvData = data.item.values.map(
+        response.push(data.payload);
+      }
+      node.status({});
+      if (config.output === "JSON") {
+        node.send({ ...msg, payload: response });
+        return;
+      }
+      if (config.output === "VALUES_ONLY") {
+        node.send({
+          ...msg,
+          payload: response.map((item: OWItemType | errorType) => {
+            return "error" in item ? item : item.values;
+          }),
+          valueTypes: response.map((item: OWItemType | errorType) => {
+            return "error" in item ? "error" : item.valueTypes;
+          }),
+          request: msg.payload,
+        });
+        return;
+      }
+
+      if (config.output === "CSV") {
+        const mappedCSVData = response.map((data: OWItemType | errorType) => {
+          if ("error" in data) {
+            return { payload: "error", request: msg.payload };
+          }
+          const csvData = data.values.map(
             (v) =>
               `${v.date},${v.value
                 .map((v, index) =>
-                  data.item.valueTypes[index].type === "String" ? `"${v}"` : v
+                  data.valueTypes[index].type === "String" ? `"${v}"` : v
                 )
                 .join(config.delimiter)}`
           );
 
           csvData.unshift(
-            ["date", ...data.item.valueTypes.map((v) => v.name)].join(
+            ["date", ...data.valueTypes.map((v) => v.name)].join(
               config.delimiter
             )
           );
-
-          node.send(Object.assign(data, { payload: csvData.join("\n") }));
-          return;
-        }
-      } else {
-        node.status({
-          fill: "red",
-          shape: "dot",
-          text: "Missing required parameters.",
+          const csvString = csvData.join("\n");
+          return { payload: csvString, request: msg.payload };
         });
+        node.send({
+          ...msg,
+          payload: mappedCSVData,
+          request: msg.payload,
+        });
+        return;
       }
     });
   }

@@ -6,4 +6,7 @@ export interface OpenwareSubscriptionNodeDef
     OpenwareSubscriptionOptions {}
 
 // export interface OpenwareSubscriptionNode extends Node {}
-export type OpenwareSubscriptionNode = Node & { webSocket: WebSocket | null };
+export type OpenwareSubscriptionNode = Node & {
+  unsubscribe: () => void | null;
+  filter: Set<string>;
+};

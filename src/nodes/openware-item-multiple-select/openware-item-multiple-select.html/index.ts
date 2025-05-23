@@ -28,7 +28,7 @@ RED.nodes.registerType<OpenwareItemMultipleSelectEditorNodeProperties>(
       const itemsSelect = document.getElementById("node-input-items");
       const cItemValues = this.items.map((el) => el.split("---"));
       const dimSelect = document.getElementById("node-input-dims");
-
+      let items = [] as OWItemType[];
       const setDimSelectFromSelectedItems = (
         selectedItems: OWItemType[],
         setValue: boolean
@@ -54,7 +54,7 @@ RED.nodes.registerType<OpenwareItemMultipleSelectEditorNodeProperties>(
 
       const fetchItemAndDims = async () => {
         const itemsReq = await fetch(`openware/itemselect/${this.server}`);
-        const items = (await itemsReq.json()) as OWItemType[];
+        items = (await itemsReq.json()) as OWItemType[];
 
         if (itemsSelect && cItemValues.length > 0) {
           itemsSelect["value"] = cItemValues.map(

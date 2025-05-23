@@ -1,53 +1,99 @@
 <script type="text/html" data-help-name="openware-data-historical">
-
-  <p>The open.WARE Data History node allows you to access historical data from an Open.WARE server.</p>
+  <p>
+    The open.WARE Data History node allows you to access historical data from an
+    Open.WARE server.
+  </p>
 
   <h2>Configuration</h2>
-  
+
   <ul>
-    <li><strong>Server:</strong> Select the Open.WARE server configuration node that this node will use to connect to the Open.WARE server.</li>
-    <li><strong>Name:</strong> Optional. Provide a custom name for this node.</li>
-    <li><strong>Output:</strong> Choose the format of the output data. Options include JSON and CSV.</li>
-    <li><strong>Delimiter:</strong> Specify the delimiter to use when outputting data in CSV format.</li>
+    <li>
+      <strong>Server:</strong> Select the Open.WARE server configuration node
+      that this node will use to connect to the Open.WARE server.
+    </li>
+    <li>
+      <strong>Name:</strong> Optional. Provide a custom name for this node.
+    </li>
+    <li>
+      <strong>Output:</strong> Choose the format of the output data. Options
+      include JSON and CSV.
+    </li>
+    <li>
+      <strong>Delimiter:</strong> Specify the delimiter to use when outputting
+      data in CSV format.
+    </li>
   </ul>
-  
+
   <h2>Input</h2>
-  
-  <p>This node accepts messages containing the following properties:</p>
-  
+  <p>
+    The node expects input messages containing parameters for data aggregation
+    in msg.query:
+  </p>
   <ul>
-    <li><strong>msg.payload.source:</strong> The source of the historical data.</li>
-    <li><strong>msg.payload.sensor:</strong> The sensor from which to retrieve historical data.</li>
-    <li><strong>msg.payload.start:</strong> The start date/time for the historical data query.</li>
-    <li><strong>msg.payload.end:</strong> The end date/time for the historical data query.</li>
+    <li>
+      <strong>sensorInfos:</strong> Object containig 'source'as string and
+      'sensor' as string and optionally an 'dimension' as number
+    </li>
+    <li>
+      <strong>start:</strong> The start date/time for the data aggregation.
+    </li>
+    <li><strong>end:</strong> The end date/time for the data aggregation.</li>
   </ul>
-  
+
   <h2>Output</h2>
-  
-  <p>This node sends messages containing the historical data retrieved from the Open.WARE server. The format of the output depends on the selected output format:</p>
-  
+
+  <p>
+    This node sends messages containing the historical data retrieved from the
+    Open.WARE server. The format of the output depends on the selected output
+    format:
+  </p>
+
   <ul>
-    <li><strong>JSON:</strong> The historical data is sent as a JSON object.</li>
-    <li><strong>CSV:</strong> The historical data is sent as a CSV string. The delimiter used is configurable.</li>
+    <li>
+      <strong>JSON:</strong> The historical data is sent as a JSON object.
+    </li>
+    <li>
+      <strong>CSV:</strong> The historical data is sent as a CSV string. The
+      delimiter used is configurable.
+    </li>
   </ul>
-  
+
   <h2>Status</h2>
-  
+
   <ul>
-    <li><strong>Select a open.WARE Server and sign in.:</strong> Indicates that the node is not connected to an Open.WARE server or the server session is not authenticated.</li>
-    <li><strong>Error fetching data.:</strong> Indicates that an error occurred while fetching historical data.</li>
-    <li><strong>Missing required parameters.:</strong> Indicates that one or more required parameters are missing from the input message.</li>
+    <li>
+      <strong>Select a open.WARE Server and sign in.:</strong> Indicates that
+      the node is not connected to an Open.WARE server or the server session is
+      not authenticated.
+    </li>
+    <li>
+      <strong>Error fetching data.:</strong> Indicates that an error occurred
+      while fetching historical data.
+    </li>
+    <li>
+      <strong>Missing required parameters.:</strong> Indicates that one or more
+      required parameters are missing from the input message.
+    </li>
   </ul>
-  
+
   <h2>Example Usage</h2>
-  
+
   <ol>
-    <li>Configure the "Server" parameter by selecting an Open.WARE server configuration node.</li>
-    <li>Provide the necessary input parameters (<code>source</code>, <code>sensor</code>, <code>start</code>, and <code>end</code>) in the input message.</li>
+    <li>
+      Configure the "Server" parameter by selecting an Open.WARE server
+      configuration node.
+    </li>
+    <li>
+      Provide the necessary input parameters (<code>source</code>,
+      <code>sensor</code>, <code>start</code>, and <code>end</code>) in the
+      input message.
+    </li>
     <li>Optionally, configure the node name, output format, and delimiter.</li>
     <li>Deploy your flow.</li>
-    <li>Input messages containing the required parameters will trigger the node to fetch historical data from the Open.WARE server.</li>
+    <li>
+      Input messages containing the required parameters will trigger the node to
+      fetch historical data from the Open.WARE server.
+    </li>
     <li>The node will output the retrieved data in the specified format.</li>
   </ol>
-      
-  </script>
+</script>

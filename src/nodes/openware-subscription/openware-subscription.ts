@@ -6,55 +6,7 @@ import {
 import WebSocket = require("ws");
 import { ConfigNode } from "../shared/types";
 import { SubscriptionMsgType } from "./shared/types";
-
-function connect(
-  webSocket: WebSocket | null,
-  node: OpenwareSubscriptionNode,
-  server: ConfigNode,
-  sources: string[]
-) {
-  if (webSocket) {
-    webSocket.close();
-  }
-
-  console.log("connecting to WebSocket!", server);
-  webSocket = new WebSocket(
-    `${server.host.replace("http", "ws")}:${server.port}/subscription`
-  );
-  webSocket.on("open", () => {
-    console.log("Connected to WebSocket");
-    node.status({ fill: "blue", shape: "dot", text: "subscribing..." });
-    const msg = {
-      action: "subscribe",
-      session: server.credentials.session,
-      sources: sources,
-    };
-
-    webSocket!.send(JSON.stringify(msg));
-  });
-  webSocket.on("message", (event: string) => {
-    node.status({ fill: "green", shape: "dot", text: "connected" });
-    try {
-      const data = JSON.parse(event);
-      node.send({ payload: data });
-    } catch (error) {
-      console.error("Error parsing message\n" + event);
-    }
-  });
-  webSocket.on("close", (event: CloseEvent) => {
-    console.log("Disconnected from WebSocket", event);
-    node.status({ fill: "red", shape: "dot", text: "disconnected." });
-    node.webSocket = null;
-  });
-  webSocket.on("error", (event: Event) => {
-    node.status({
-      fill: "red",
-      shape: "dot",
-      text: "error" + JSON.stringify(event),
-    });
-  });
-  return webSocket;
-}
+import { unsubscribe } from "diagnostics_channel";
 
 const nodeInit: NodeInitializer = (RED): void => {
   function OpenwareSubscriptionNodeConstructor(
@@ -65,68 +17,69 @@ const nodeInit: NodeInitializer = (RED): void => {
     const server = RED.nodes.getNode(config.server) as ConfigNode;
     RED.nodes.createNode(this, config);
     const node = this;
-    setTimeout(() => {
-      node.status({ fill: "red", shape: "dot", text: "disconnected." });
-    }, 500);
+    node.filter = new Set<string>();
+    node.status({
+      fill: "yellow",
+      shape: "ring",
+      text: "Not subscribed.",
+    });
 
     node.on("close", function () {
-      console.log("Disconnecting from WebSocket");
-      if (node.webSocket) {
-        node.webSocket.close();
-        node.webSocket = null;
-        console.log("Disconnected");
+      console.log("Canceling subscription");
+      if (node.unsubscribe) {
+        node.unsubscribe();
       }
     });
 
     node.on("input", function (msg: SubscriptionMsgType) {
-      if (
-        (!msg.payload ||
-          !Array.isArray(msg.payload) ||
-          msg.payload.length < 1) &&
-        !msg.disconnect
-      ) {
+      if (!msg.query && !msg.disconnect) {
         node.status({
           fill: "red",
           shape: "dot",
-          text: "No sources specified in msg.payload",
+          text: "No sources in sensorInfos in msg.query",
         });
         return;
       }
 
       if (msg.disconnect) {
-        console.log("Disconnecting from WebSocket");
-        if (node.webSocket) {
-          node.webSocket.close();
-          node.webSocket = null;
+        console.log("Canceling subscription");
+        if (node.unsubscribe) {
+          node.unsubscribe();
         }
         return;
       }
       //node.send({ payload: { server: server, config: config } });
+
+      node.filter.clear();
+      if (node.unsubscribe) {
+        node.unsubscribe();
+      }
+      msg.query!.sensorInfos.forEach((item) => {
+        node.filter.add(item.source + "---" + item.sensor);
+      });
+
       if (server.credentials.session) {
-        node.webSocket = connect(
-          node.webSocket,
-          node,
-          server,
-          msg.payload as string[]
-        );
-        setInterval(() => {
-          if (node.webSocket) {
-            node.webSocket.send(
-              JSON.stringify({
-                action: "ping",
-              })
-            );
-          } else {
-            node.webSocket = connect(
-              node.webSocket,
-              node,
-              server,
-              msg.payload as string[]
-            );
-          }
-        }, 60 * 1000);
+        node.unsubscribe = server.api.addSubscription({
+          filter: (msg) => node.filter.has(msg?.source + "---" + msg?.id),
+          onMessage: (wsmsg) => {
+            node.send({ ...msg, payload: wsmsg });
+          },
+          onStatus: (status) => {
+            node.status(status);
+            if (status.fill === "red") {
+              node.send([null, { payload: { connected: false } }]);
+            } else {
+              node.send([null, { payload: { connected: true } }]);
+            }
+          },
+        });
+        node.status({
+          fill: "yellow",
+          shape: "dot",
+          text: "Waiting for first message ....",
+        });
       } else {
-        node.status({ fill: "red", shape: "dot", text: "disconnected." });
+        node.status({ fill: "red", shape: "dot", text: "No Login provided" });
       }
     });
   }

@@ -6,11 +6,16 @@ export interface OpenwareDataLiveOptions {
   amount?: number;
   delimiter?: string;
 }
-export type LiveMsgType = NodeMessageInFlow & {
-  date?: number;
-  amount?: number;
-};
+
 export type LiveMsgPayloadType = NodeMessageInFlow & {
-  source: string;
-  sensor: string;
+  amount?: number;
+  date?: number;
+
+  query?: {
+    end?: number;
+    sensorInfos?: {
+      source: string;
+      sensor: string;
+    }[];
+  };
 };

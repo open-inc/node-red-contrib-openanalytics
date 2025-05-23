@@ -1,35 +1,66 @@
-
 <script type="text/html" data-help-name="openware-items">
-
   <h1>OpenWARE Fetch Items Node</h1>
 
   <h2>Introduction</h2>
-  <p>The OpenWARE Fetch Items node allows you to access available items from one or more sources within an open.WARE instance. This node can be configured to retrieve data from a specified server and is useful for integrating open.WARE data into your Node-RED flows.</p>
+  <p>
+    The OpenWARE Fetch Items node allows you to access available items from one
+    or more sources within an open.WARE instance. This node can be configured to
+    retrieve data from a specified server and is useful for integrating
+    open.WARE data into your Node-RED flows.
+  </p>
 
   <h2>Node Configuration</h2>
   <ul>
-      <li><strong>Name:</strong> <br> The name of the node instance. This name is used to label the node within your flow.</li>
-      <li><strong>Server:</strong> <br> The open.WARE server configuration from which to fetch the items. This should be configured to connect to your open.WARE instance.</li>
+    <li>
+      <strong>Name:</strong> <br />
+      The name of the node instance. This name is used to label the node within
+      your flow.
+    </li>
+    <li>
+      <strong>Server:</strong> <br />
+      The open.WARE server configuration from which to fetch the items. This
+      should be configured to connect to your open.WARE instance.
+    </li>
   </ul>
 
   <h2>Input</h2>
-  <p>This node accepts one input:</p>
+  <p>This node accepts input:</p>
   <ul>
-      <li>A message object (<code>msg</code>) that triggers the node to fetch items from the configured open.WARE server. If <code>msg.sources</code> is provided and is a array of strings, only items belonging to the sources contained in the array will be fetched.</li>
+    <li>
+      A message object (<code>msg</code>) that triggers the node to fetch items
+      from the configured open.WARE server. If <code>msg.payload</code> is a
+      <code>string[]</code> or <code>msg.query.sensorInfos</code>, e.g. using
+      item-multiple-select, is provided, only items belonging to the sources
+      contained in the arrays will be fetched.
+    </li>
   </ul>
 
   <h2>Output</h2>
   <p>This node produces one output:</p>
   <ul>
-      <li>A message object (<code>msg</code>) containing the fetched items from the open.WARE instance. The items will be available in <code>msg.payload</code>.</li>
+    <li>
+      A message object (<code>msg</code>) containing the fetched items from the
+      open.WARE instance. The items will be available in
+      <code>msg.payload</code>.
+    </li>
   </ul>
 
   <h2>Usage</h2>
   <p>To use the OpenWARE Fetch Items node:</p>
   <ol>
-      <li>Drag and drop the node into your Node-RED workspace.</li>
-      <li>Configure the node by specifying the server and a name for the node instance.</li>
-      <li>Connect the node to other nodes in your flow to trigger the fetch operation and process the retrieved items.</li>
-      <li>Deploy your flow. When the node receives an input message, it will fetch the items from the specified open.WARE server and pass them to the next node in the flow.</li>
+    <li>Drag and drop the node into your Node-RED workspace.</li>
+    <li>
+      Configure the node by specifying the server and a name for the node
+      instance.
+    </li>
+    <li>
+      Connect the node to other nodes in your flow to trigger the fetch
+      operation and process the retrieved items.
+    </li>
+    <li>
+      Deploy your flow. When the node receives an input message, it will fetch
+      the items from the specified open.WARE server and pass them to the next
+      node in the flow.
+    </li>
   </ol>
 </script>
