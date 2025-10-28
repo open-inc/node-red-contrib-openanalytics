@@ -58,14 +58,21 @@ export async function initApi(node: ConfigNode) {
   const sources = async (): Promise<SourceMessage> => {
     const cItems = await items();
     if (cItems.status === "success") {
-      const allSourceTags = cItems.payload.map((item) => item.source);
-      const uniqueSources = new Set(allSourceTags);
-      const uniqueSourcesArray = Array.from(uniqueSources);
-      return {
-        status: "success",
-        payload: uniqueSourcesArray,
-        sources: uniqueSourcesArray,
-      };
+      try {
+        const allSourceTags = cItems.payload.map((item) => item.source);
+        const uniqueSources = new Set(allSourceTags);
+        const uniqueSourcesArray = Array.from(uniqueSources);
+        return {
+          status: "success",
+          payload: uniqueSourcesArray,
+          sources: uniqueSourcesArray,
+        };
+      } catch (e) {
+        return {
+          status: "error",
+          payload: { error: e, response: "Failed to process sources" },
+        };
+      }
     } else {
       return cItems;
     }
