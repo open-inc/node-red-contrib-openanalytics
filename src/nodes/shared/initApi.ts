@@ -223,7 +223,8 @@ export async function initApi(node: ConfigNode) {
   const addSubscription = (sub: WSSubscription) => {
     const id = "ID_" + Math.random().toString(16);
     node.subscriptions[id] = sub;
-    console.log("Subscriptions", node.subscriptions);
+    console.log("Added subscription", id, sub["description" as keyof WSSubscription] || "");
+    console.log("Subscriptions", JSON.stringify(node.subscriptions, null, 2));
     return () => {
       delete node.subscriptions[id];
     };

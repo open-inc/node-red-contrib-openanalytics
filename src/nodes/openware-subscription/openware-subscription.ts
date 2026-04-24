@@ -72,6 +72,7 @@ const nodeInit: NodeInitializer = (RED): void => {
               node.send([null, { payload: { connected: true } }]);
             }
           },
+          description: JSON.stringify(msg.query!.sensorInfos),
         });
         node.status({
           fill: "yellow",

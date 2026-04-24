@@ -74,6 +74,7 @@ export interface WSSubscription {
   onMessage: (message: any) => void;
   onStatus: (status: StatusMessage) => void;
   filter: (message: any) => boolean;
+  description?: string;
 }
 
 export type ConfigNode = Node & {
