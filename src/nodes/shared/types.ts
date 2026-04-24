@@ -5,16 +5,16 @@ import { WebSocket } from "ws";
 export type ProcessChild = ChildProcessWithoutNullStreams | undefined | null;
 export type ValueType = {
   type:
-    | "number"
-    | "string"
-    | "boolean"
-    | "geo"
-    | "object"
-    | "String"
-    | "Boolean"
-    | "Number"
-    | "Geo"
-    | "Object";
+  | "number"
+  | "string"
+  | "boolean"
+  | "geo"
+  | "object"
+  | "String"
+  | "Boolean"
+  | "Number"
+  | "Geo"
+  | "Object";
   name: string;
   unit: string;
 };
@@ -40,11 +40,11 @@ export type SentMessage =
   | { status: "error"; payload: errorType };
 export type DataItemMessage =
   | {
-      status: "success";
-      item: OWItemType;
-      payload: OWItemType;
-      request?: any;
-    }
+    status: "success";
+    item: OWItemType;
+    payload: OWItemType;
+    request?: any;
+  }
   | { status: "error"; payload: errorType; url?: string };
 
 export type OWItemType = {
@@ -63,6 +63,12 @@ export type StatusMessage = {
   fill: "red" | "green" | "yellow" | "blue" | "grey";
   shape: NodeStatusShape;
   text: string;
+};
+
+export type SensorInfoType = {
+  source: string;
+  sensor: string;
+  dimension?: number;
 };
 export interface WSSubscription {
   onMessage: (message: any) => void;
@@ -108,11 +114,7 @@ export type ConfigNode = Node & {
 };
 
 export type MultiSelectPayloadType = {
-  sensorInfos: {
-    source: string;
-    sensor: string;
-    dimension?: number;
-  }[];
+  sensorInfos: SensorInfoType[];
   start?: number;
   end?: number;
 };

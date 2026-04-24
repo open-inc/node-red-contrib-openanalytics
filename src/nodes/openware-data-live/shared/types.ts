@@ -1,4 +1,5 @@
 import { NodeMessageInFlow } from "node-red";
+import { SensorInfoType } from "src/nodes/shared/types";
 
 export interface OpenwareDataLiveOptions {
   server: string;
@@ -13,9 +14,6 @@ export type LiveMsgPayloadType = NodeMessageInFlow & {
 
   query?: {
     end?: number;
-    sensorInfos?: {
-      source: string;
-      sensor: string;
-    }[];
+    sensorInfos?: SensorInfoType[];
   };
 };

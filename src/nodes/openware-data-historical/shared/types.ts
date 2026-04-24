@@ -1,4 +1,5 @@
 import { NodeMessageInFlow } from "node-red";
+import { SensorInfoType } from "src/nodes/shared/types";
 
 export interface OpenwareDataHistoricalOptions {
   server: string;
@@ -12,11 +13,7 @@ export type HistoricalMsgPayloadType = NodeMessageInFlow & {
   date?: number;
 
   query?: {
-    sensorInfos: {
-      source: string;
-      sensor: string;
-      dimension?: number;
-    }[];
+    sensorInfos: SensorInfoType[];
     start: number;
     end: number;
   };
