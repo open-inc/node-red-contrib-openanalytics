@@ -1,5 +1,5 @@
 import { NodeMessageInFlow } from "node-red";
-import { SensorInfoType } from "src/nodes/shared/types";
+import { SensorInfoType } from "../../shared/types";
 
 export interface OpenwareDataHistoricalOptions {
   server: string;

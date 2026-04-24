@@ -1,10 +1,10 @@
 import { Node, NodeDef, NodeMessage } from "node-red";
 import { OpenwareSourcesOptions } from "../shared/types";
-import { errorType, SourceMessage } from "src/nodes/shared/types";
+import { errorType, SourceMessage } from "../../shared/types";
 
 export interface OpenwareSourcesNodeDef
   extends NodeDef,
-    OpenwareSourcesOptions {}
+  OpenwareSourcesOptions { }
 
 export interface OpenwareSourcesNode extends Node {
   send(msg: SourceMessage): void;
