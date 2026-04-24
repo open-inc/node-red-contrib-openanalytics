@@ -29,14 +29,14 @@ RED.nodes.registerType<OpenwareConfigEditorNodeProperties>("openware-config", {
     const node = this;
     const host = $("#node-config-input-host").val();
     const port = $("#node-config-input-port").val();
-    const username = $("#node-config-input-username").val();
-    let password = $("#node-config-input-password").val();
+    const username = $("#node-config-input-username").val() as string;
+    let password = $("#node-config-input-password").val() as (string | undefined);
     if (password === "__PWRD__") {
       password = undefined;
     }
 
     if (host && port && username && password) {
-      const url = `${host}:${port}/api/users/login?username=${username}&password=${password}`;
+      const url = `${host}:${port}/api/users/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
       console.log("Refreshing session", url);
       const resp = await fetch(url);
       const data = await resp.json();
