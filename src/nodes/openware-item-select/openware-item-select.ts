@@ -1,9 +1,10 @@
-import { NodeInitializer, NodeMessage, NodeMessageInFlow } from "node-red";
+import { NodeInitializer } from "node-red";
 import {
   OpenwareItemSelectNode,
   OpenwareItemSelectNodeDef,
 } from "./modules/types";
 import { OpenwareConfigNode } from "../openware-config/modules/types";
+import { MultiSelectPayloadType, SensorInfoType } from "../shared/types";
 
 const nodeInit: NodeInitializer = (RED): void => {
   function OpenwareItemSelectNodeConstructor(
@@ -13,26 +14,37 @@ const nodeInit: NodeInitializer = (RED): void => {
     RED.nodes.createNode(this, config);
 
     this.on("input", (msg: any, send, done) => {
-      const item = config.item.split("---");
+      const item = (config.item || "").split("---");
       if (item.length !== 2) {
-        RED.log.error("Invalid item configuration");
-        this.debug("Invalid item configuration");
+        const err = new Error("Invalid item configuration");
+        RED.log.error(err.message);
+        done(err);
         return;
       }
+
       if (
         !msg.query ||
         typeof msg.query !== "object" ||
-        !msg.query.sensorInfos ||
-        typeof msg.query.sensorInfos !== "object"
+        !Array.isArray(msg.query.sensorInfos)
       ) {
-        msg.query = { sensorInfos: {} };
+        msg.query = { sensorInfos: [] } as MultiSelectPayloadType;
       }
-      msg.query.sensorInfos.sensor = msg.query.sensorInfos.sensor || item[1];
-      msg.query.sensorInfos.source = msg.query.sensorInfos.source || item[0];
-      msg.query.sensorInfos.dimension =
-        msg.query.sensorInfos.dimension ?? parseInt(config.dim);
-      msg.query.start = msg.query.start ?? new Date(config.start).getTime();
-      msg.query.end = msg.query.end ?? new Date(config.end).getTime();
+
+      const dim = parseInt(config.dim, 10);
+      const sensorInfo: SensorInfoType = {
+        source: item[0],
+        sensor: item[1],
+        dimension: Number.isFinite(dim) ? dim : 0,
+      };
+
+      (msg.query as MultiSelectPayloadType).sensorInfos.push(sensorInfo);
+
+      const startTs = new Date(config.start).getTime();
+      const endTs = new Date(config.end).getTime();
+      msg.query.start =
+        msg.query.start ?? (Number.isFinite(startTs) ? startTs : undefined);
+      msg.query.end =
+        msg.query.end ?? (Number.isFinite(endTs) ? endTs : undefined);
 
       send(msg);
       done();
@@ -43,13 +55,30 @@ const nodeInit: NodeInitializer = (RED): void => {
     "openware-item-select",
     OpenwareItemSelectNodeConstructor
   );
-  RED.httpAdmin.get("/openware/itemselect/:confid", function (req, res) {
-    console.log("Items for: ", req.params.confid);
-    const conf = RED.nodes.getNode(req.params.confid) as OpenwareConfigNode;
-    conf.api.items().then((items) => {
-      res.send(items.payload);
-    });
-  });
+
+  RED.httpAdmin.get(
+    "/openware/itemselect/:confid",
+    RED.auth.needsPermission("flows.read"),
+    (req, res) => {
+      const conf = RED.nodes.getNode(req.params.confid) as
+        | OpenwareConfigNode
+        | null;
+      if (!conf?.api) {
+        res.status(404).send({ error: "Config node not found or not ready" });
+        return;
+      }
+      conf.api.items().then(
+        (items) => {
+          if (items.status === "error") {
+            res.status(502).send({ error: items.payload.error });
+            return;
+          }
+          res.send(items.payload);
+        },
+        (err) => res.status(500).send({ error: String(err) })
+      );
+    }
+  );
 };
 
 export = nodeInit;

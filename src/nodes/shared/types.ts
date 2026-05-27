@@ -28,7 +28,11 @@ export type errorType = {
   response?: string;
   url?: string;
 };
-export type ApiMessage = SourceMessage | ItemMessage | DataItemMessage;
+export type ApiMessage =
+  | SourceMessage
+  | ItemMessage
+  | DataItemMessage
+  | SentMessage;
 export type SourceMessage =
   | { status: "success"; sources: string[]; payload: string[] }
   | { status: "error"; payload: errorType };
@@ -77,12 +81,22 @@ export interface WSSubscription {
   description?: string;
 }
 
+export type LoginStatus = {
+  state: "idle" | "logging-in" | "ok" | "failed";
+  text: string;
+  ts: number;
+};
+
 export type ConfigNode = Node & {
   host: string;
   port: number;
   webSocket: WebSocket | null;
   subscriptions: Record<string, WSSubscription>;
   keepAlive: NodeJS.Timeout | null;
+  reconnectTimer?: NodeJS.Timeout | null;
+  connecting?: boolean;
+  shouldReconnect?: boolean;
+  lastLoginStatus?: LoginStatus;
   api: {
     items: (source?: string) => Promise<ItemMessage>;
     sources: () => Promise<SourceMessage>;
@@ -106,6 +120,7 @@ export type ConfigNode = Node & {
     sendStream: (data: OWItemType, mode: "update" | "push") => SentMessage;
     addSubscription: (sub: WSSubscription) => () => void;
     destroy: () => void;
+    login: () => Promise<boolean>;
   };
   credentials: {
     username: string;

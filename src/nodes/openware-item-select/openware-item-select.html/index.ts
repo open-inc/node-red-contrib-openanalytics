@@ -44,9 +44,43 @@ RED.nodes.registerType<OpenwareItemSelectEditorNodeProperties>(
         }
       };
 
+      let allItems: OWItemType[] = [];
+      const sortItems = (arr: OWItemType[]) =>
+        [...arr].sort((a, b) =>
+          (a.source + a.name).localeCompare(b.source + b.name)
+        );
+
+      const renderOptions = (query: string) => {
+        if (!itemsSelect) return;
+        const q = query.trim().toLowerCase();
+        const currentValue = (itemsSelect as any).value as string | undefined;
+        const filtered = allItems.filter((item) => {
+          if (!q) return true;
+          const text =
+            `[${item.source}] ${item.name} - ${item.id}`.toLowerCase();
+          const val = `${item.source}---${item.id}`.toLowerCase();
+          if (currentValue && val === currentValue.toLowerCase()) return true;
+          return text.includes(q) || val.includes(q);
+        });
+        itemsSelect.innerHTML = sortItems(filtered)
+          .map(
+            (item) =>
+              `<sl-option value="${item.source}---${item.id}">[${item.source}] ${item.name} - ${item.id}</sl-option>`
+          )
+          .join("\n");
+        // Re-apply value so Shoelace keeps the selection after innerHTML changes
+        if (currentValue) (itemsSelect as any).value = currentValue;
+        const countEl = document.getElementById("openware-item-select-count");
+        if (countEl) {
+          countEl.textContent = q
+            ? `${filtered.length} / ${allItems.length} match`
+            : `${allItems.length} items`;
+        }
+      };
+
       const fetchItemAndDims = async () => {
         const itemsReq = await fetch(`openware/itemselect/${this.server}`);
-        const items = (await itemsReq.json()) as OWItemType[];
+        allItems = (await itemsReq.json()) as OWItemType[];
 
         // If the config is reopened then we need to set the value of the select for input and dimension:
         if (itemsSelect && cItemValue.length === 2) {
@@ -56,7 +90,7 @@ RED.nodes.registerType<OpenwareItemSelectEditorNodeProperties>(
               // @ts-expect-error
               this.dim instanceof Number ? this.dim : parseInt(this.dim);
 
-            const selected = items.find(
+            const selected = allItems.find(
               (item) =>
                 item.id === cItemValue[1] && item.source === cItemValue[0]
             );
@@ -65,12 +99,19 @@ RED.nodes.registerType<OpenwareItemSelectEditorNodeProperties>(
             }
           }
         }
-        itemsSelect!.innerHTML = items
-          .sort((a, b) => (a.source + a.name).localeCompare(b.source + b.name))
-          .map((item) => {
-            return `<sl-option value="${item.source}---${item.id}">[${item.source}] ${item.name} - ${item.id}</sl-option>`;
-          })
-          .join("\n");
+
+        const searchInput = document.getElementById(
+          "openware-item-select-search"
+        ) as HTMLInputElement | null;
+
+        renderOptions(searchInput?.value || "");
+
+        if (searchInput && !(searchInput as any)._owFilterAttached) {
+          (searchInput as any)._owFilterAttached = true;
+          searchInput.addEventListener("input", () => {
+            renderOptions(searchInput.value || "");
+          });
+        }
 
         itemsSelect?.addEventListener("sl-change", (event) => {
           //@ts-expect-error
@@ -79,7 +120,7 @@ RED.nodes.registerType<OpenwareItemSelectEditorNodeProperties>(
             alert("Invalid selection");
             return;
           }
-          const selected = items.find(
+          const selected = allItems.find(
             (item) => item.id === sourceId[1] && item.source === sourceId[0]
           );
           if (!selected) {

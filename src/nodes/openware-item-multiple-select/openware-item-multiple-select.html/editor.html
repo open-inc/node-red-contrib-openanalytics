@@ -13,9 +13,14 @@
     <input type="text" id="node-input-server" placeholder="Server...">
   </div>
   <div class="form-row">
+    <label for="openware-item-multiple-select-search"><i class="fa fa-search"></i> Filter</label>
+    <input type="search" id="openware-item-multiple-select-search" placeholder="Type to filter items..." style="width:70%; display: inline-block;">
+    <span id="openware-item-multiple-select-count" style="margin-left:8px;color:#888;font-size:12px;"></span>
+  </div>
+  <div class="form-row">
     <label for="node-input-items">Item</label>
     <!-- <sl-select id="node-input-items" multiple clearable> -->
-      <sl-select id="node-input-items" style="width:70%; display: inline-block;" multiple clearable> 
+      <sl-select id="node-input-items" style="width:70%; display: inline-block;" multiple clearable>
       <!-- <sl-option value="option-1">Option 1</sl-option> -->
     </sl-select>
   </div>

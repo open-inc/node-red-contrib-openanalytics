@@ -3,21 +3,36 @@ import {
   OpenwareSubscriptionNode,
   OpenwareSubscriptionNodeDef,
 } from "./modules/types";
-import WebSocket = require("ws");
 import { ConfigNode } from "../shared/types";
 import { SubscriptionMsgType } from "./shared/types";
-import { unsubscribe } from "diagnostics_channel";
 
 const nodeInit: NodeInitializer = (RED): void => {
   function OpenwareSubscriptionNodeConstructor(
     this: OpenwareSubscriptionNode,
     config: OpenwareSubscriptionNodeDef
   ): void {
-    if (config.server === undefined) return;
-    const server = RED.nodes.getNode(config.server) as ConfigNode;
     RED.nodes.createNode(this, config);
     const node = this;
     node.filter = new Set<string>();
+
+    if (config.server === undefined) {
+      node.status({
+        fill: "red",
+        shape: "ring",
+        text: "Select a open.WARE Server.",
+      });
+      return;
+    }
+    const server = RED.nodes.getNode(config.server) as ConfigNode;
+    if (!server) {
+      node.status({
+        fill: "red",
+        shape: "ring",
+        text: "Server config not found.",
+      });
+      return;
+    }
+
     node.status({
       fill: "yellow",
       shape: "ring",
@@ -48,7 +63,6 @@ const nodeInit: NodeInitializer = (RED): void => {
         }
         return;
       }
-      //node.send({ payload: { server: server, config: config } });
 
       node.filter.clear();
       if (node.unsubscribe) {
@@ -60,7 +74,8 @@ const nodeInit: NodeInitializer = (RED): void => {
 
       if (server.credentials.session) {
         node.unsubscribe = server.api.addSubscription({
-          filter: (msg) => node.filter.has(msg?.source + "---" + msg?.id),
+          filter: (wsmsg) =>
+            node.filter.has(wsmsg?.source + "---" + wsmsg?.id),
           onMessage: (wsmsg) => {
             node.send({ ...msg, payload: wsmsg });
           },

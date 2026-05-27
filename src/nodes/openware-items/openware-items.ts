@@ -1,9 +1,8 @@
 import { NodeInitializer } from "node-red";
 import { OpenwareItemsNode, OpenwareItemsNodeDef } from "./modules/types";
-import { ConfigNode, ItemMessage, OWItemType } from "../shared/types";
+import { ConfigNode, ItemMessage } from "../shared/types";
 import { ItemsMsgType } from "./shared/types";
 import { isError } from "../shared/helper";
-import { stringify } from "querystring";
 
 const nodeInit: NodeInitializer = (RED): void => {
   function OpenwareItemsNodeConstructor(
@@ -28,18 +27,16 @@ const nodeInit: NodeInitializer = (RED): void => {
       }
 
       if (
-        (msg.payload &&
-          typeof msg.payload === "object" &&
-          length in msg.payload) ||
+        Array.isArray(msg.payload) ||
         msg?.query?.sensorInfos
       ) {
-        let sources = [];
+        let sources: string[] = [];
         if (msg?.query) {
           sources = msg.query.sensorInfos.map((info) => info.source);
         } else {
-          sources = (msg.payload as any[]).map(
+          sources = (msg.payload as unknown[]).map(
             (source) => "" + (source ? source : "")
-          ) as string[];
+          );
         }
         const reqs = sources.map((source) => server.api.items(source));
 

@@ -3,6 +3,26 @@ import { OpenwareConfigEditorNodeProperties } from "./modules/types";
 
 declare const RED: EditorRED;
 
+type LoginStatus = {
+  state: "idle" | "logging-in" | "ok" | "failed";
+  text: string;
+  ts: number;
+};
+
+const STATE_COLOR: Record<LoginStatus["state"], string> = {
+  ok: "#5cb85c",
+  "logging-in": "#5bc0de",
+  failed: "#d9534f",
+  idle: "#bbb",
+};
+
+function renderStatus(s: LoginStatus | null | undefined) {
+  const state = (s?.state ?? "idle") as LoginStatus["state"];
+  const text = s?.text ?? "unknown";
+  $("#openware-config-login-dot").css("background", STATE_COLOR[state] ?? "#bbb");
+  $("#openware-config-login-text").text(text);
+}
+
 RED.nodes.registerType<OpenwareConfigEditorNodeProperties>("openware-config", {
   category: "config",
   defaults: {
@@ -22,9 +42,41 @@ RED.nodes.registerType<OpenwareConfigEditorNodeProperties>("openware-config", {
     password: { type: "password" },
   },
   oneditprepare: function () {
-    console.log("Preparing config");
+    const node = this;
+    const topic = `openware-config/${node.id}/login-status`;
+
+    renderStatus({ state: "idle", text: "loading...", ts: 0 });
+
+    // Fetch current snapshot (in case no comms message arrives soon)
+    if (node.id) {
+      $.getJSON(`openware/config/${node.id}/login-status`)
+        .done((data: LoginStatus) => renderStatus(data))
+        .fail(() =>
+          renderStatus({ state: "idle", text: "(deploy to start)", ts: 0 })
+        );
+    } else {
+      renderStatus({ state: "idle", text: "(deploy to start)", ts: 0 });
+    }
+
+    // Subscribe to live updates pushed via RED.comms.publish
+    const handler = (_topic: string, payload: LoginStatus) => {
+      renderStatus(payload);
+    };
+    (RED.comms as any).subscribe(topic, handler);
+    (node as any)._openwareStatusHandler = { topic, handler };
+  },
+  oneditcancel: function () {
+    const h = (this as any)._openwareStatusHandler;
+    if (h) (RED.comms as any).unsubscribe(h.topic, h.handler);
+  },
+  oneditdelete: function () {
+    const h = (this as any)._openwareStatusHandler;
+    if (h) (RED.comms as any).unsubscribe(h.topic, h.handler);
   },
   oneditsave: async function () {
+    const h = (this as any)._openwareStatusHandler;
+    if (h) (RED.comms as any).unsubscribe(h.topic, h.handler);
+
     console.log("Saving config", this);
     const node = this;
     const host = $("#node-config-input-host").val();
@@ -53,21 +105,6 @@ RED.nodes.registerType<OpenwareConfigEditorNodeProperties>("openware-config", {
       } else {
         console.log("Error", data);
       }
-      // .then((res) => {
-      //     res.json().then((json) => {
-      //     if (json.status === 200) {
-      //         this.credentials.session = json.result.session;
-      //         init(this);
-      //         console.log("-".repeat(20), "this New", "-".repeat(20));
-      //         console.log(this);
-      //         console.log("-".repeat(20), "config new", "-".repeat(20));
-      //         console.log(n);
-      //     }
-      //     });
-      // })
-      // .catch((err) => {
-      //     console.log(err);
-      // });
     } else {
       //@ts-expect-error
       if (node.credentials?.session) {

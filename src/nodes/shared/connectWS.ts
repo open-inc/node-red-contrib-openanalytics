@@ -1,77 +1,152 @@
-import { ConfigNode, WSSubscription } from "./types";
+import { ConfigNode, StatusMessage, WSSubscription } from "./types";
 import { WebSocket } from "ws";
-async function timeout() {
-  return new Promise((res) => setTimeout(res, 5000));
-}
-export async function connect(server: ConfigNode) {
-  let lastPing = Date.now();
 
+const RECONNECT_DELAY_MS = 5000;
+const PING_INTERVAL_MS = 10 * 1000;
+const PING_TIMEOUT_MS = 20 * 1000;
+
+function setStatusForAll(server: ConfigNode, status: StatusMessage) {
+  // reflect on the config node itself (visible via admin API / config sidebar)
+  try {
+    server.status(status);
+  } catch {
+    // ignore — node may not be fully wired yet
+  }
+  Object.values(server.subscriptions).forEach((sub: WSSubscription) =>
+    sub.onStatus(status)
+  );
+}
+
+export function scheduleReconnect(
+  server: ConfigNode,
+  delayMs = RECONNECT_DELAY_MS
+) {
+  if (server.shouldReconnect === false) return;
+  if (server.reconnectTimer) return;
+  console.log(`[${server.host}] Scheduling reconnect in ${delayMs}ms`);
+  server.reconnectTimer = setTimeout(() => {
+    server.reconnectTimer = null;
+    connect(server);
+  }, delayMs);
+}
+
+function teardownSocket(server: ConfigNode) {
+  if (server.keepAlive) {
+    clearInterval(server.keepAlive);
+    server.keepAlive = null;
+  }
   if (server.webSocket) {
-    console.log("Closing existing WebSocket connection");
-    server.webSocket.close();
+    try {
+      server.webSocket.removeAllListeners();
+      server.webSocket.terminate();
+    } catch (e) {
+      // ignore
+    }
     server.webSocket = null;
   }
-  Object.values(server.subscriptions).forEach((sub: WSSubscription) => {
-    sub.onStatus({ fill: "blue", shape: "dot", text: "connecting..." });
-  });
-  if (!server.credentials.session) {
-    console.error("No session found");
-    Object.values(server.subscriptions).forEach((sub: WSSubscription) => {
-      sub.onStatus({ fill: "red", shape: "dot", text: "Please login first." });
-    });
+}
+
+export async function connect(server: ConfigNode) {
+  server.shouldReconnect = true;
+
+  if (server.connecting) {
+    console.log(`[${server.host}] Connect already in progress, skipping`);
     return;
   }
+  server.connecting = true;
+
+  let lastPing = Date.now();
+
+  teardownSocket(server);
+  setStatusForAll(server, {
+    fill: "blue",
+    shape: "dot",
+    text: "connecting...",
+  });
+
+  if (!server.credentials.session) {
+    console.log(`[${server.host}] No session — attempting login`);
+    const ok = await server.api.login();
+    if (!ok) {
+      setStatusForAll(server, {
+        fill: "red",
+        shape: "dot",
+        text: "Please login first.",
+      });
+      server.connecting = false;
+      scheduleReconnect(server);
+      return;
+    }
+  }
+
   const sources = await server.api.sources();
 
   if (sources.status === "error") {
     console.error("Error fetching sources", sources.payload);
-    Object.values(server.subscriptions).forEach((sub: WSSubscription) => {
-      sub.onStatus({ fill: "red", shape: "dot", text: sources.payload.error });
+    setStatusForAll(server, {
+      fill: "red",
+      shape: "dot",
+      text: String(sources.payload.error),
     });
-
-    await timeout();
-    connect(server);
+    server.connecting = false;
+    scheduleReconnect(server);
     return;
   }
+
   console.log("Connecting to WebSocket!");
 
-  server.webSocket = new WebSocket(
-    `${server.host.replace("http", "ws")}:${server.port}/subscription`
-  );
+  let ws: WebSocket;
+  try {
+    ws = new WebSocket(
+      `${server.host.replace("http", "ws")}:${server.port}/subscription`
+    );
+  } catch (e) {
+    console.error(`[${server.host}] Failed to construct WebSocket`, e);
+    server.connecting = false;
+    scheduleReconnect(server);
+    return;
+  }
+  server.webSocket = ws;
 
-  server.webSocket.on("open", () => {
+  ws.on("open", () => {
     console.log("Connected to WebSocket");
-    Object.values(server.subscriptions).forEach((sub: WSSubscription) => {
-      sub.onStatus({ fill: "blue", shape: "dot", text: "subscribing..." });
+    lastPing = Date.now();
+    server.connecting = false;
+    setStatusForAll(server, {
+      fill: "blue",
+      shape: "dot",
+      text: "subscribing...",
     });
-    if (server.keepAlive) {
-      clearInterval(server.keepAlive);
-    }
+
+    if (server.keepAlive) clearInterval(server.keepAlive);
     server.keepAlive = setInterval(() => {
-      // console.log(
-      //   `[${server.host}:${server.webSocket?.OPEN === 1 ? "ONLINE" : "OFFLINE"}] Last Ping: ${new Date(lastPing).toUTCString()} `
-      // );
-      if (Date.now() - lastPing < 20 * 1000) {
-        // console.log(`[${server.host}] Sending ping.`);
-        if (!server.webSocket || !server.webSocket?.OPEN) {
-          server!.webSocket!.send(
-            JSON.stringify({
-              action: "ping",
-            })
-          );
+      if (server.webSocket !== ws || ws.readyState !== WebSocket.OPEN) {
+        // socket replaced or no longer open; close handler will recover
+        return;
+      }
+      if (Date.now() - lastPing < PING_TIMEOUT_MS) {
+        try {
+          ws.send(JSON.stringify({ action: "ping" }));
+        } catch (e) {
+          console.error(`[${server.host}] Failed to send ping`, e);
         }
       } else {
-        console.log(`[${server.host}] Offline. Attempting to reconnect...`);
-        Object.values(server.subscriptions).forEach((sub) => {
-          sub.onStatus({ fill: "red", shape: "dot", text: "reconnecting" });
+        console.log(
+          `[${server.host}] No activity for ${PING_TIMEOUT_MS}ms. Reconnecting...`
+        );
+        setStatusForAll(server, {
+          fill: "red",
+          shape: "dot",
+          text: "reconnecting",
         });
-        if (server.webSocket) server.webSocket.terminate();
-        if (server.keepAlive) {
-          clearInterval(server.keepAlive);
+        // terminate triggers the close handler, which schedules reconnect
+        try {
+          ws.terminate();
+        } catch (e) {
+          // ignore
         }
-        connect(server);
       }
-    }, 10 * 1000);
+    }, PING_INTERVAL_MS);
 
     const msg = {
       action: "subscribe",
@@ -83,23 +158,29 @@ export async function connect(server: ConfigNode) {
       console.log(
         `Subscribing to ${sources.payload.length} sources on ${server.host}`
       );
-
-      server.webSocket!.send(JSON.stringify(msg));
+      ws.send(JSON.stringify(msg));
     } catch (error) {
       console.error("Error sending message\n" + JSON.stringify(msg));
-      Object.values(server.subscriptions).forEach((sub: WSSubscription) => {
-        sub.onStatus({
-          fill: "red",
-          shape: "dot",
-          text: "error" + JSON.stringify(error),
-        });
+      setStatusForAll(server, {
+        fill: "red",
+        shape: "dot",
+        text: "error" + JSON.stringify(error),
       });
     }
   });
-  server.webSocket.on("message", (event: string) => {
+
+  let everSawMessage = false;
+  ws.on("message", (event: string) => {
     try {
       lastPing = Date.now();
-
+      if (!everSawMessage) {
+        everSawMessage = true;
+        try {
+          server.status({ fill: "green", shape: "dot", text: "connected" });
+        } catch {
+          // ignore
+        }
+      }
       const data = JSON.parse(event);
       Object.values(server.subscriptions).forEach((sub: WSSubscription) => {
         try {
@@ -119,21 +200,34 @@ export async function connect(server: ConfigNode) {
       console.error("Error parsing message\n" + event);
     }
   });
-  server.webSocket.on("close", (event: CloseEvent) => {
-    console.log("Disconnected from WebSocket", event);
-    Object.values(server.subscriptions).forEach((sub: WSSubscription) => {
-      sub.onStatus({ fill: "red", shape: "dot", text: "disconnected." });
+
+  ws.on("close", (code: number, reason: Buffer) => {
+    console.log(
+      `[${server.host}] WebSocket closed (${code})${reason?.length ? ": " + reason.toString() : ""}`
+    );
+    setStatusForAll(server, {
+      fill: "red",
+      shape: "dot",
+      text: "disconnected.",
     });
-    server.webSocket = null;
+    if (server.keepAlive) {
+      clearInterval(server.keepAlive);
+      server.keepAlive = null;
+    }
+    if (server.webSocket === ws) {
+      server.webSocket = null;
+    }
+    server.connecting = false;
+    scheduleReconnect(server);
   });
 
-  server.webSocket.on("error", (event: Event) => {
-    Object.values(server.subscriptions).forEach((sub: WSSubscription) => {
-      sub.onStatus({
-        fill: "red",
-        shape: "dot",
-        text: "error" + JSON.stringify(event),
-      });
+  ws.on("error", (error: Error) => {
+    console.error(`[${server.host}] WebSocket error`, error?.message ?? error);
+    setStatusForAll(server, {
+      fill: "red",
+      shape: "dot",
+      text: "error: " + (error?.message ?? "unknown"),
     });
+    // 'close' fires after 'error' on the ws library and schedules the reconnect
   });
 }

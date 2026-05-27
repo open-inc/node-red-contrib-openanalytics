@@ -3,7 +3,7 @@ import {
   OpenwareItemMultipleSelectNode,
   OpenwareItemMultipleSelectNodeDef,
 } from "./modules/types";
-import { MultiSelectPayloadType } from "../shared/types";
+import { MultiSelectPayloadType, SensorInfoType } from "../shared/types";
 
 const nodeInit: NodeInitializer = (RED): void => {
   function OpenwareItemMultipleSelectNodeConstructor(
@@ -11,57 +11,59 @@ const nodeInit: NodeInitializer = (RED): void => {
     config: OpenwareItemMultipleSelectNodeDef
   ): void {
     RED.nodes.createNode(this, config);
+    const node = this;
 
     this.on("input", (msg: any, send, done) => {
       const items =
-        config.items.length > 0
+        (config.items?.length ?? 0) > 0
           ? config.items.map((el) => el.split("---"))
           : [];
-      const dims = config.dims.length > 0 ? config.dims : [];
-
-      let sensorInfos = dims.map((dim) => {
-        const dimInfo = dim.split("---");
-        if (dimInfo.length !== 3) {
-          RED.log.error("Invalid dimension configuration");
-          this.debug("Invalid dimension configuration");
-          return;
-        }
-
-        return {
-          source: dimInfo[0],
-          sensor: dimInfo[1],
-          dimension: parseInt(dimInfo[2]),
-        } as MultiSelectPayloadType["sensorInfos"][number];
-      });
+      const dims = (config.dims?.length ?? 0) > 0 ? config.dims : [];
 
       for (const item of items) {
         if (item.length !== 2) {
-          RED.log.error("Invalid item configuration");
-          this.debug("Invalid item configuration");
+          const err = new Error("Invalid item configuration");
+          RED.log.error(err.message);
+          done(err);
           return;
         }
       }
 
-      if (sensorInfos.length === 0) {
-        sensorInfos = items.map((item) => {
-          return {
-            source: item[0],
-            sensor: item[1],
-          };
+      const sensorInfos: SensorInfoType[] = [];
+      for (const dim of dims) {
+        const dimInfo = dim.split("---");
+        if (dimInfo.length !== 3) {
+          const err = new Error("Invalid dimension configuration");
+          RED.log.error(err.message);
+          done(err);
+          return;
+        }
+        const parsed = parseInt(dimInfo[2], 10);
+        sensorInfos.push({
+          source: dimInfo[0],
+          sensor: dimInfo[1],
+          dimension: Number.isFinite(parsed) ? parsed : 0,
         });
       }
 
-      if (!msg.query || typeof msg.query !== "object") {
-        msg.query = {};
+      if (sensorInfos.length === 0) {
+        for (const item of items) {
+          sensorInfos.push({ source: item[0], sensor: item[1] });
+        }
       }
-      console.log("start", config.start);
-      console.log("end", config.end);
+
+      if (!msg.query || typeof msg.query !== "object") {
+        msg.query = {} as MultiSelectPayloadType;
+      }
       msg.query.sensorInfos = msg.query.sensorInfos ?? sensorInfos;
-      msg.query.start = msg.query.start ?? new Date(config.start).getTime();
-      msg.query.end = msg.query.end ?? new Date(config.end).getTime();
-      console.log("msg.query:", msg.query);
-      console.log("sensorInfos:", sensorInfos);
-      console.log("items:", items);
+
+      const startTs = new Date(config.start).getTime();
+      const endTs = new Date(config.end).getTime();
+      msg.query.start =
+        msg.query.start ?? (Number.isFinite(startTs) ? startTs : undefined);
+      msg.query.end =
+        msg.query.end ?? (Number.isFinite(endTs) ? endTs : undefined);
+
       send(msg);
       done();
     });

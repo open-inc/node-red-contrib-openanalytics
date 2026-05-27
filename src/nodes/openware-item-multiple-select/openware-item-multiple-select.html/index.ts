@@ -52,6 +52,44 @@ RED.nodes.registerType<OpenwareItemMultipleSelectEditorNodeProperties>(
         }
       };
 
+      const sortItems = (arr: OWItemType[]) =>
+        [...arr].sort((a, b) =>
+          (a.source + a.name + a.id).localeCompare(b.source + b.name + b.id)
+        );
+
+      const renderOptions = (query: string) => {
+        if (!itemsSelect) return;
+        const q = query.trim().toLowerCase();
+        const currentValue = (itemsSelect as any).value as string[] | undefined;
+        const selectedSet = new Set(
+          Array.isArray(currentValue) ? currentValue : []
+        );
+        const filtered = items.filter((item) => {
+          const val = `${item.source}---${item.id}`;
+          if (selectedSet.has(val)) return true;
+          if (!q) return true;
+          const text =
+            `[${item.source}] ${item.name} - ${item.id}`.toLowerCase();
+          return text.includes(q) || val.toLowerCase().includes(q);
+        });
+        itemsSelect.innerHTML = sortItems(filtered)
+          .map(
+            (item) =>
+              `<sl-option value="${item.source}---${item.id}">[${item.source}] ${item.name} - ${item.id}</sl-option>`
+          )
+          .join("\n");
+        // Re-apply value so Shoelace keeps the multi-selection after innerHTML changes
+        if (currentValue) (itemsSelect as any).value = currentValue;
+        const countEl = document.getElementById(
+          "openware-item-multiple-select-count"
+        );
+        if (countEl) {
+          countEl.textContent = q
+            ? `${filtered.length} / ${items.length} match`
+            : `${items.length} items`;
+        }
+      };
+
       const fetchItemAndDims = async () => {
         const itemsReq = await fetch(`openware/itemselect/${this.server}`);
         items = (await itemsReq.json()) as OWItemType[];
@@ -78,14 +116,19 @@ RED.nodes.registerType<OpenwareItemMultipleSelectEditorNodeProperties>(
             }
           }
         }
-        itemsSelect!.innerHTML = items
-          .sort((a, b) =>
-            (a.source + a.name + a.id).localeCompare(b.source + b.name + b.id)
-          )
-          .map((item) => {
-            return `<sl-option value="${item.source}---${item.id}">[${item.source}] ${item.name} - ${item.id}</sl-option>`;
-          })
-          .join("\n");
+
+        const searchInput = document.getElementById(
+          "openware-item-multiple-select-search"
+        ) as HTMLInputElement | null;
+
+        renderOptions(searchInput?.value || "");
+
+        if (searchInput && !(searchInput as any)._owFilterAttached) {
+          (searchInput as any)._owFilterAttached = true;
+          searchInput.addEventListener("input", () => {
+            renderOptions(searchInput.value || "");
+          });
+        }
 
         itemsSelect?.addEventListener("sl-change", (event) => {
           // @ts-expect-error
