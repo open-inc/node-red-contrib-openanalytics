@@ -1,0 +1,48 @@
+<script type="text/html" data-help-name="openinc-parse-fetch-relation">
+  <p>
+    Fetches the objects that are members of a Parse
+    <a href="https://docs.parseplatform.org/rest/guide/#relations">Relation</a>
+    field, using a <code>$relatedTo</code> query against the relation's target
+    class.
+  </p>
+
+  <h2>Relation key</h2>
+  <p>
+    The relation field to read is taken from <code>msg.relationKey</code> if
+    present, otherwise from the node's <strong>Relation</strong> setting.
+  </p>
+
+  <h2>Identifying the parent object</h2>
+  <p>Select one of two modes via <strong>Parent from</strong>:</p>
+  <ul>
+    <li>
+      <strong>Settings (class + id):</strong> the parent object is identified by
+      the configured <strong>Class</strong> and <strong>Object ID</strong>.
+      Both may also be supplied per message via <code>msg.className</code> and
+      <code>msg.objectId</code>.
+    </li>
+    <li>
+      <strong>msg.payload object:</strong> the parent is read from
+      <code>msg.payload</code> — a single Parse object as returned by the
+      <strong>parse find</strong> node. Its <code>className</code> and
+      <code>objectId</code> are used, and the relation's target class is read
+      from <code>msg.payload[relationKey]</code> when that field is populated.
+    </li>
+  </ul>
+
+  <h2>Target class</h2>
+  <p>
+    A <code>$relatedTo</code> query runs against the relation's target class.
+    Leave <strong>Target Class</strong> empty to auto-detect it: from the
+    relation field in the payload (payload mode), or by fetching the parent
+    object (settings mode). Set it explicitly to skip the extra lookup.
+  </p>
+
+  <h2>Output</h2>
+  <ul>
+    <li><strong>msg.payload:</strong> Array of related objects.</li>
+    <li><strong>msg.count:</strong> Total count (when the query requests it).</li>
+    <li><strong>msg.query:</strong> The <code>$relatedTo</code> query executed.</li>
+    <li><strong>msg.parent:</strong> The resolved <code>{ className, objectId }</code>.</li>
+  </ul>
+</script>

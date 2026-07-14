@@ -1,0 +1,45 @@
+<script type="text/html" data-help-name="openinc-parse-save">
+  <p>
+    Creates or updates an object on a Parse Server. If an
+    <strong>Object ID</strong> is set (either in the node settings or in
+    <code>msg.payload.objectId</code>) the object is updated, otherwise a new
+    object is created.
+  </p>
+
+  <h2>Configuration</h2>
+
+  <ul>
+    <li><strong>Server:</strong> The Parse Server configuration node.</li>
+    <li>
+      <strong>Class:</strong> Name of the Parse class. Can be overridden per
+      message via <code>msg.payload.className</code>.
+    </li>
+    <li>
+      <strong>Object ID:</strong> Optional. If set, this node always updates
+      that object. If empty, <code>msg.payload.objectId</code> is used when
+      present.
+    </li>
+  </ul>
+
+  <h2>Input</h2>
+
+  <ul>
+    <li>
+      <strong>msg.payload.data:</strong> Optional. If set, this object is
+      saved as-is.
+    </li>
+    <li>
+      Otherwise all fields of <code>msg.payload</code> (except
+      <code>className</code> and <code>objectId</code>) are saved.
+    </li>
+  </ul>
+
+  <h2>Output</h2>
+
+  <p>
+    <code>msg.payload</code> contains <code>className</code>,
+    <code>objectId</code> and the server response
+    (<code>createdAt</code> for new objects, <code>updatedAt</code> for
+    updates). The saved fields are available in <code>msg.request</code>.
+  </p>
+</script>

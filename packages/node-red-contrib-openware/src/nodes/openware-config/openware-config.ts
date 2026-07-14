@@ -32,7 +32,7 @@ const nodeInit: NodeInitializer = (RED): void => {
     "/openware/config/:id/login-status",
     RED.auth.needsPermission("flows.read"),
     (req, res) => {
-      const node = RED.nodes.getNode(req.params.id) as OpenwareConfigNode | null;
+      const node = RED.nodes.getNode(String(req.params.id)) as OpenwareConfigNode | null;
       if (!node) {
         res.status(404).send({ error: "Config node not found" });
         return;

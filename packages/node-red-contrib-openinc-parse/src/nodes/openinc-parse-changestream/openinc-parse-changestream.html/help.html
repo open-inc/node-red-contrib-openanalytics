@@ -1,0 +1,54 @@
+<script type="text/html" data-help-name="openinc-parse-changestream">
+  <p>
+    Polls the <code>OD3_Changelog</code> class of an open.INC Parse Server in
+    a configurable interval and outputs every new changelog entry as a
+    change stream. This is an alternative to LiveQuery when websockets are
+    not available.
+  </p>
+
+  <h2>Configuration</h2>
+
+  <ul>
+    <li><strong>Server:</strong> The Parse Server configuration node. The
+      configured user needs read access to <code>OD3_Changelog</code>
+      (authenticated user or master key).</li>
+    <li><strong>Class:</strong> Optional filter on the changed class
+      (<code>nameOfClass</code>). Empty = changes of all classes.</li>
+    <li><strong>Operations:</strong> Optional comma separated filter on the
+      operation, e.g. <code>create,update,delete</code>.</li>
+    <li><strong>Interval:</strong> Poll interval in seconds (default 10).</li>
+    <li><strong>Batch limit:</strong> Maximum entries fetched per request.
+      If a poll returns a full batch, the node immediately fetches the next
+      batch until it caught up.</li>
+    <li><strong>Emit existing:</strong> If checked, all existing changelog
+      entries are emitted once after deploy. Otherwise the stream starts
+      with changes that happen after the deploy.</li>
+  </ul>
+
+  <h2>Input</h2>
+
+  <p>Any incoming message triggers an immediate poll.</p>
+
+  <h2>Output</h2>
+
+  <p>One message per changelog entry, ordered by <code>createdAt</code>:</p>
+
+  <pre>msg.payload = {
+  event,       // operation: create | update | delete | ...
+  className,   // nameOfClass
+  objectId,    // changedObject
+  value,       // new values (if recorded)
+  original,    // previous values (if recorded)
+  actingUser,  // pointer to the acting _User
+  changelog,   // the full OD3_Changelog object
+}</pre>
+
+  <h2>Status</h2>
+
+  <ul>
+    <li><strong>watching:</strong> Connected, no new changes in the last
+      poll.</li>
+    <li><strong>n changes @ time:</strong> New entries were emitted.</li>
+    <li><strong>Error:</strong> The query failed (see debug sidebar).</li>
+  </ul>
+</script>

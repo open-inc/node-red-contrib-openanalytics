@@ -1,0 +1,35 @@
+<script type="text/html" data-help-name="openinc-parse-delete">
+  <p>Deletes an object from a Parse Server class.</p>
+
+  <h2>Configuration</h2>
+
+  <ul>
+    <li><strong>Server:</strong> The Parse Server configuration node.</li>
+    <li>
+      <strong>Class:</strong> Name of the Parse class. Can be overridden per
+      message via <code>msg.payload.className</code>.
+    </li>
+    <li>
+      <strong>Object ID:</strong> Optional. If empty,
+      <code>msg.payload.objectId</code> (or a plain string
+      <code>msg.payload</code>) is used.
+    </li>
+  </ul>
+
+  <h2>Input</h2>
+
+  <ul>
+    <li>
+      <strong>msg.payload:</strong> Either a string containing the object id,
+      or an object with <code>objectId</code> and optionally
+      <code>className</code>.
+    </li>
+  </ul>
+
+  <h2>Output</h2>
+
+  <p>
+    <code>msg.payload</code> contains <code>className</code>,
+    <code>objectId</code> and <code>deleted: true</code> on success.
+  </p>
+</script>

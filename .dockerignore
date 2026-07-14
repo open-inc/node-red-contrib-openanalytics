@@ -1,0 +1,8 @@
+.git
+node_modules
+**/node_modules
+**/dist
+**/*.tsbuildinfo
+node-red
+Dockerfile
+docker-compose.yml

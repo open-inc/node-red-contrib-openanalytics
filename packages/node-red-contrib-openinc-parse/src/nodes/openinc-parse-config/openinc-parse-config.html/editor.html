@@ -1,0 +1,54 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.17.0/cdn/themes/light.css" />
+<script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.17.0/cdn/shoelace-autoloader.js"></script>
+
+<script type="text/html" data-template-name="openinc-parse-config">
+  <div class="form-row">
+      <label for="node-config-input-serverUrl"><i class="fa fa-server"></i> Server URL</label>
+      <input type="text" id="node-config-input-serverUrl" placeholder="http://localhost:1337/parse">
+  </div>
+  <div class="form-row">
+      <label for="node-config-input-liveQueryUrl"><i class="fa fa-bolt"></i> LiveQuery URL</label>
+      <input type="text" id="node-config-input-liveQueryUrl" placeholder="(optional, e.g. ws://localhost:1337/parse)">
+  </div>
+  <div class="form-row">
+      <label for="node-config-input-appId"><i class="fa fa-id-card-o"></i> App ID</label>
+      <input type="text" id="node-config-input-appId">
+  </div>
+  <div class="form-row">
+      <label for="node-config-input-restApiKey"><i class="fa fa-key"></i> REST API Key</label>
+      <input type="password" id="node-config-input-restApiKey" placeholder="(optional)">
+  </div>
+  <div class="form-row">
+      <label for="node-config-input-javascriptKey"><i class="fa fa-key"></i> JavaScript Key</label>
+      <input type="password" id="node-config-input-javascriptKey" placeholder="(optional)">
+  </div>
+  <div class="form-row">
+      <label for="node-config-input-masterKey"><i class="fa fa-key"></i> Master Key</label>
+      <input type="password" id="node-config-input-masterKey" placeholder="(optional)">
+  </div>
+  <div class="form-row">
+      <label for="node-config-input-useMasterKey"><i class="fa fa-unlock-alt"></i> Use Master Key</label>
+      <input type="checkbox" id="node-config-input-useMasterKey" style="display:inline-block;width:auto;vertical-align:top;">
+  </div>
+  <div class="form-row">
+      <label for="node-config-input-sessionToken"><i class="fa fa-user-secret"></i> Session Token</label>
+      <input type="password" id="node-config-input-sessionToken" placeholder="(optional)">
+  </div>
+  <div class="form-row">
+      <label><i class="fa fa-plug"></i> Connection</label>
+      <sl-button id="openinc-parse-config-test" size="small">Test connection</sl-button>
+      <span id="openinc-parse-config-test-result" style="margin-left:8px;font-size:13px;color:#888;"></span>
+  </div>
+
+  <div class="form-row" style="margin-bottom:0;">
+      <label for="node-config-input-schema" style="vertical-align:top;"><i class="fa fa-sitemap"></i> Schema</label>
+      <div style="display:inline-block;width:70%;vertical-align:top;">
+          <sl-button id="openinc-parse-config-fetch-schema" size="small">Fetch from server</sl-button>
+          <span id="openinc-parse-config-schema-result" style="margin-left:8px;font-size:13px;color:#888;"></span>
+      </div>
+  </div>
+  <div class="form-row">
+      <label></label>
+      <textarea id="node-config-input-schema" rows="6" placeholder='Paste the schema exported from the Parse dashboard, or click "Fetch from server" (requires a Master Key).' style="width:70%;font-family:monospace;"></textarea>
+  </div>
+</script>

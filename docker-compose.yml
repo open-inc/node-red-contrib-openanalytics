@@ -1,0 +1,23 @@
+services:
+  node-red:
+    build: .
+    container_name: openinc-node-red
+    ports:
+      - "1880:1880"
+    environment:
+      # Set all three to authenticate the Node-RED editor against a Parse
+      # Server instead of the default admin credentials. Users need an
+      # OD3_Permission with key "openware:nodered".
+      - OI_PARSE_AUTH_ENABLED=${OI_PARSE_AUTH_ENABLED:-}
+      - OI_PARSE_URL=${OI_PARSE_URL:-}
+      - OI_PARSE_APPID=${OI_PARSE_APPID:-}
+    volumes:
+      # Node-RED user dir (flows.json, settings.js, installed nodes) lives on
+      # the host. On first start the entrypoint seeds it with the image
+      # defaults and installs both workspace packages into it.
+      - ./node-red/data:/root/.node-red
+      # Optional: mount the built packages for live development. Rebuild on
+      # the host (pnpm build), then restart the container:
+      # - ./packages/node-red-contrib-openware:/root/nodes/packages/node-red-contrib-openware
+      # - ./packages/node-red-contrib-openinc-parse:/root/nodes/packages/node-red-contrib-openinc-parse
+    restart: unless-stopped

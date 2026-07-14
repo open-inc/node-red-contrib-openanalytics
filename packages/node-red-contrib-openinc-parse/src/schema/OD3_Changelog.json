@@ -1,0 +1,87 @@
+{
+  "className": "OD3_Changelog",
+  "fields": {
+    "objectId": {
+      "type": "String"
+    },
+    "createdAt": {
+      "type": "Date"
+    },
+    "updatedAt": {
+      "type": "Date"
+    },
+    "ACL": {
+      "type": "ACL"
+    },
+    "actingUser": {
+      "type": "Pointer",
+      "targetClass": "_User",
+      "required": false
+    },
+    "masterkey": {
+      "type": "Boolean",
+      "required": true,
+      "default": false
+    },
+    "context": {
+      "type": "Object",
+      "required": false
+    },
+    "nameOfClass": {
+      "type": "String",
+      "required": true
+    },
+    "changedObject": {
+      "type": "String",
+      "required": true
+    },
+    "operation": {
+      "type": "String",
+      "required": true
+    },
+    "value": {
+      "type": "Object",
+      "required": false
+    },
+    "original": {
+      "type": "Object",
+      "required": false
+    }
+  },
+  "classLevelPermissions": {
+    "find": {
+      "requiresAuthentication": true,
+      "role:od-admin": true
+    },
+    "count": {
+      "requiresAuthentication": true,
+      "role:od-admin": true
+    },
+    "get": {
+      "requiresAuthentication": true,
+      "role:od-admin": true
+    },
+    "create": {
+      "role:od-admin": true
+    },
+    "update": {
+      "requiresAuthentication": true,
+      "role:od-admin": true
+    },
+    "delete": {
+      "requiresAuthentication": true,
+      "role:od-admin": true
+    },
+    "addField": {
+      "role:od-admin": true
+    },
+    "protectedFields": {
+      "*": []
+    }
+  },
+  "indexes": {
+    "_id_": {
+      "_id": 1
+    }
+  }
+}

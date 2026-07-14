@@ -1,0 +1,40 @@
+<script type="text/html" data-help-name="openinc-parse-config">
+  <p>
+    Configuration node holding the connection settings for a Parse Server.
+    All Parse nodes of this package reference such a configuration.
+  </p>
+
+  <h2>Configuration</h2>
+
+  <ul>
+    <li>
+      <strong>Server URL:</strong> Full URL of the Parse Server REST endpoint
+      including the mount path, e.g. <code>https://example.com/parse</code>.
+    </li>
+    <li>
+      <strong>LiveQuery URL:</strong> Optional websocket URL of the LiveQuery
+      server (e.g. <code>wss://example.com/parse</code>). If empty, the Server
+      URL is used with the protocol switched to <code>ws://</code> /
+      <code>wss://</code>.
+    </li>
+    <li><strong>App ID:</strong> The Parse application id.</li>
+    <li>
+      <strong>REST API Key / JavaScript Key / Master Key:</strong> Optional
+      keys sent as the corresponding <code>X-Parse-*</code> headers.
+    </li>
+    <li>
+      <strong>Use Master Key:</strong> If checked (and a master key is set),
+      all requests are performed with the master key.
+    </li>
+    <li>
+      <strong>Session Token:</strong> Optional session token of a Parse user,
+      sent as <code>X-Parse-Session-Token</code>.
+    </li>
+  </ul>
+
+  <p>
+    The <strong>Test connection</strong> button calls the
+    <code>/health</code> endpoint of the configured server through the
+    Node-RED runtime.
+  </p>
+</script>

@@ -60,7 +60,7 @@ const nodeInit: NodeInitializer = (RED): void => {
     "/openware/itemselect/:confid",
     RED.auth.needsPermission("flows.read"),
     (req, res) => {
-      const conf = RED.nodes.getNode(req.params.confid) as
+      const conf = RED.nodes.getNode(String(req.params.confid)) as
         | OpenwareConfigNode
         | null;
       if (!conf?.api) {

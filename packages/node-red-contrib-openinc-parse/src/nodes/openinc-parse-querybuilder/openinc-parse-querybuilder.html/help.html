@@ -1,0 +1,45 @@
+<script type="text/html" data-help-name="openinc-parse-querybuilder">
+  <p>
+    Builds a Parse query object from configurable conditions. The result is
+    written to <code>msg.payload</code> and can be fed directly into the
+    <strong>parse find</strong> or <strong>parse subscribe</strong> node.
+  </p>
+
+  <h2>Configuration</h2>
+
+  <ul>
+    <li><strong>Class:</strong> Name of the Parse class to query.</li>
+    <li>
+      <strong>Conditions:</strong> A list of constraints. Each condition
+      consists of a field name, an operator, a value and a value type:
+      <ul>
+        <li><strong>string / number / boolean / JSON:</strong> The value is
+          converted accordingly.</li>
+        <li><strong>date:</strong> The value is parsed as a date and sent as
+          a Parse <code>Date</code>.</li>
+        <li><strong>pointer:</strong> The value
+          <code>ClassName:objectId</code> is sent as a Parse
+          <code>Pointer</code>.</li>
+        <li><strong>msg property:</strong> The value is read from the
+          incoming message at runtime (e.g. <code>payload.userId</code>).</li>
+      </ul>
+    </li>
+    <li><strong>Limit / Skip / Order / Keys / Include / Count:</strong>
+      Optional query parameters.</li>
+  </ul>
+
+  <h2>Input</h2>
+
+  <p>
+    Any message triggers the node. If <code>msg.payload.where</code> already
+    contains constraints, they are combined with the configured conditions
+    using <code>$and</code>.
+  </p>
+
+  <h2>Output</h2>
+
+  <p>
+    <code>msg.payload</code> contains the query object:
+    <code>{ className, where, limit, skip, order, keys, include, count }</code>
+  </p>
+</script>

@@ -1,0 +1,51 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.17.0/cdn/themes/light.css" />
+<script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.17.0/cdn/shoelace-autoloader.js"></script>
+
+<script type="text/html" data-template-name="openinc-parse-querybuilder">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-server"><i class="fa fa-server"></i> Schema</label>
+    <input type="text" id="node-input-server" placeholder="(optional) Parse Server — for field autocomplete only">
+  </div>
+  <div class="form-row">
+    <label for="node-input-className"><i class="fa fa-table"></i> Class</label>
+    <input type="text" id="node-input-className" placeholder="Parse class name">
+  </div>
+
+  <div class="form-row">
+    <label><i class="fa fa-filter"></i> Conditions</label>
+    <div style="display:inline-block;width:78%;vertical-align:top;">
+      <div id="parse-qb-conditions"></div>
+      <sl-button id="parse-qb-add" size="small">+ Add condition</sl-button>
+    </div>
+    <input type="hidden" id="node-input-conditions">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-limit"><i class="fa fa-list-ol"></i> Limit</label>
+    <input type="text" id="node-input-limit" placeholder="(optional)">
+  </div>
+  <div class="form-row">
+    <label for="node-input-skip"><i class="fa fa-forward"></i> Skip</label>
+    <input type="text" id="node-input-skip" placeholder="(optional)">
+  </div>
+  <div class="form-row">
+    <label for="node-input-order"><i class="fa fa-sort"></i> Order</label>
+    <input type="text" id="node-input-order" placeholder="(optional, e.g. -createdAt)">
+  </div>
+  <div class="form-row">
+    <label for="node-input-keys"><i class="fa fa-columns"></i> Keys</label>
+    <input type="text" id="node-input-keys" placeholder="(optional, comma separated)">
+  </div>
+  <div class="form-row">
+    <label for="node-input-include"><i class="fa fa-link"></i> Include</label>
+    <input type="text" id="node-input-include" placeholder="(optional, comma separated pointers)">
+  </div>
+  <div class="form-row">
+    <label for="node-input-count"><i class="fa fa-calculator"></i> Count</label>
+    <input type="checkbox" id="node-input-count" style="display:inline-block;width:auto;vertical-align:top;">
+  </div>
+</script>

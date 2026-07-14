@@ -1,0 +1,61 @@
+<script type="text/html" data-help-name="openinc-parse-subscribe">
+  <p>
+    Subscribes to a Parse <strong>LiveQuery</strong> and emits a message for
+    every <code>create</code>, <code>update</code>, <code>delete</code>,
+    <code>enter</code> or <code>leave</code> event of the matching objects.
+    The connection reconnects automatically with backoff.
+  </p>
+
+  <h2>Configuration</h2>
+
+  <ul>
+    <li>
+      <strong>Server:</strong> The Parse Server configuration node. The
+      LiveQuery URL from the configuration is used (or derived from the
+      Server URL).
+    </li>
+    <li>
+      <strong>Class:</strong> Optional. If set, the node subscribes
+      immediately after deploy.
+    </li>
+    <li>
+      <strong>Where:</strong> Optional JSON constraints for the subscription.
+    </li>
+  </ul>
+
+  <h2>Input</h2>
+
+  <ul>
+    <li>
+      <strong>msg.payload:</strong> A query object (e.g. from the
+      <strong>parse querybuilder</strong> node) or a plain where object.
+      Receiving a query replaces the current subscription.
+    </li>
+    <li>
+      <strong>msg.disconnect:</strong> Set to <code>true</code> to cancel the
+      subscription.
+    </li>
+  </ul>
+
+  <h2>Outputs</h2>
+
+  <ol>
+    <li>
+      <strong>Events:</strong> <code>msg.payload</code> =
+      <code>{ event, object, original, className }</code>.
+      <code>original</code> is only present for <code>update</code> /
+      <code>leave</code> events (requires LiveQuery configured accordingly).
+    </li>
+    <li>
+      <strong>Connection status:</strong> <code>msg.payload</code> =
+      <code>{ connected, status }</code>.
+    </li>
+  </ol>
+
+  <h2>Requirements</h2>
+
+  <p>
+    The Parse Server must have LiveQuery enabled for the subscribed class
+    (<code>liveQuery.classNames</code> in the server configuration).
+  </p>
+</script>

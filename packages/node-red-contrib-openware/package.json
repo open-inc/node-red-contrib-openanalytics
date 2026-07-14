@@ -1,0 +1,81 @@
+{
+  "name": "@openinc/node-red-contrib-openware",
+  "version": "1.0.21",
+  "description": "Nodes to access a open.WARE Middleware by open.INC",
+  "scripts": {
+    "add-node": "node ./utils/add-node.js",
+    "copy": "copyfiles -u 2 \"./src/nodes/**/*.{png,svg}\" \"./dist/nodes/\"",
+    "build:editor": "rollup -c rollup.config.editor.mjs",
+    "build:editor:watch": "rollup -c rollup.config.editor.mjs -w",
+    "build:runtime": "tsc -p tsconfig.runtime.json",
+    "build:runtime:watch": "tsc -p tsconfig.runtime.watch.json --watch --preserveWatchOutput",
+    "build": "rimraf dist && npm run copy && npm run build:editor && npm run build:runtime",
+    "dev": "rimraf  dist && npm run copy && concurrently --kill-others --names 'COPY,EDITOR,RUNTIME,TEST' --prefix '({name})' --prefix-colors 'yellow.bold,cyan.bold,greenBright.bold,magenta.bold' 'onchange -v \"src/**/*.png\" \"src/**/*.svg\" -- npm run copy' 'npm run build:editor:watch' 'npm run build:runtime:watch' ",
+    "lint": "prettier --ignore-path .eslintignore --check '**/*.{js,ts,md}'; eslint --ext .js,.ts .",
+    "lint:fix": "prettier --ignore-path .eslintignore --write '**/*.{js,ts,md}'; eslint --ext .js,.ts . --fix",
+    "publishToNPM": "npm publish --access public"
+  },
+  "author": "Martin Stein",
+  "keywords": [
+    "node-red",
+    "node",
+    "IoT",
+    "timeseries",
+    "open.WARE",
+    "open.DASH",
+    "open.INC"
+  ],
+  "contributors": [
+    "open.INC GmbH"
+  ],
+  "license": "MIT",
+  "node-red": {
+    "version": ">=2.0.0",
+    "nodes": {
+      "openware-config": "./dist/nodes/openware-config/openware-config.js",
+      "openware-sources": "./dist/nodes/openware-sources/openware-sources.js",
+      "openware-items": "./dist/nodes/openware-items/openware-items.js",
+      "openware-subscription": "./dist/nodes/openware-subscription/openware-subscription.js",
+      "openware-data-send": "./dist/nodes/openware-data-send/openware-data-send.js",
+      "openware-data-live": "./dist/nodes/openware-data-live/openware-data-live.js",
+      "openware-data-historical": "./dist/nodes/openware-data-historical/openware-data-historical.js",
+      "openware-data-aggregate": "./dist/nodes/openware-data-aggregate/openware-data-aggregate.js",
+      "openware-csv2ow": "./dist/nodes/openware-csv2ow/openware-csv2ow.js",
+      "openware-stream-send": "./dist/nodes/openware-stream-send/openware-stream-send.js",
+      "openware-item-select": "./dist/nodes/openware-item-select/openware-item-select.js",
+      "openware-item-multiple-select": "./dist/nodes/openware-item-multiple-select/openware-item-multiple-select.js",
+      "openware-data-historical-merge": "./dist/nodes/openware-data-historical-merge/openware-data-historical-merge.js",
+      "openware-data-pca": "./dist/nodes/openware-data-pca/openware-data-pca.js"
+    }
+  },
+  "dependencies": {
+    "@types/json-to-pretty-yaml": "^1.2.1",
+    "form-data-body": "^0.1.0",
+    "json-to-pretty-yaml": "^1.2.2",
+    "tslib": "^2.8.1",
+    "ws": "^8.18.2"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@types/express": "^5.0.2",
+    "@types/node": "^22.15.21",
+    "@types/node-red": "^1.3.5",
+    "@types/ws": "^8.18.1",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
+    "colorette": "^2.0.20",
+    "concurrently": "^5.3.0",
+    "copyfiles": "^2.4.1",
+    "eslint": "^9.27.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.4.0",
+    "glob": "^11.0.2",
+    "mustache": "^4.2.0",
+    "node-red": "^1.3.7",
+    "onchange": "^7.1.0",
+    "prettier": "^3.5.3",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.41.0",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,41 @@
+<script type="text/html" data-template-name="openinc-parse-fetch-relation">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-server"><i class="fa fa-server"></i> Server</label>
+    <input type="text" id="node-input-server" placeholder="Parse Server...">
+  </div>
+  <div class="form-row">
+    <label for="node-input-relationKey"><i class="fa fa-link"></i> Relation</label>
+    <input type="text" id="node-input-relationKey" placeholder="relation field key (or msg.relationKey)">
+  </div>
+  <div class="form-row">
+    <label for="node-input-source"><i class="fa fa-sign-in"></i> Parent from</label>
+    <select id="node-input-source" style="width:70%">
+      <option value="config">Settings (class + id)</option>
+      <option value="payload">msg.payload object</option>
+    </select>
+  </div>
+  <div class="form-row node-row-config">
+    <label for="node-input-className"><i class="fa fa-table"></i> Class</label>
+    <input type="text" id="node-input-className" placeholder="parent class name">
+  </div>
+  <div class="form-row node-row-config">
+    <label for="node-input-objectId"><i class="fa fa-hashtag"></i> Object ID</label>
+    <input type="text" id="node-input-objectId" placeholder="parent objectId">
+  </div>
+  <div class="form-row">
+    <label for="node-input-targetClassName"><i class="fa fa-crosshairs"></i> Target Class</label>
+    <input type="text" id="node-input-targetClassName" placeholder="(optional, auto-detected)">
+  </div>
+  <div class="form-row">
+    <label for="node-input-limit"><i class="fa fa-list-ol"></i> Limit</label>
+    <input type="text" id="node-input-limit" placeholder="(optional, default 100)">
+  </div>
+  <div class="form-row">
+    <label for="node-input-order"><i class="fa fa-sort"></i> Order</label>
+    <input type="text" id="node-input-order" placeholder="(optional, e.g. -createdAt)">
+  </div>
+</script>

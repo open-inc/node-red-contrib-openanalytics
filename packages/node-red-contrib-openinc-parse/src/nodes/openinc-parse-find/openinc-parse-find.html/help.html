@@ -1,0 +1,44 @@
+<script type="text/html" data-help-name="openinc-parse-find">
+  <p>
+    Runs a query against a Parse Server class and outputs the matching
+    objects.
+  </p>
+
+  <h2>Configuration</h2>
+
+  <ul>
+    <li><strong>Server:</strong> The Parse Server configuration node.</li>
+    <li>
+      <strong>Class:</strong> Name of the Parse class. Can be overridden per
+      message via <code>msg.payload.className</code>.
+    </li>
+    <li><strong>Limit / Order:</strong> Optional defaults used when the
+      incoming query does not set them.</li>
+  </ul>
+
+  <h2>Input</h2>
+
+  <p><code>msg.payload</code> can be either:</p>
+
+  <ul>
+    <li>
+      A full query object as produced by the
+      <strong>parse querybuilder</strong> node:
+      <code>{ className, where, limit, skip, order, keys, include, count }</code>
+    </li>
+    <li>
+      A plain <a href="https://docs.parseplatform.org/rest/guide/#queries">where
+      object</a>, e.g. <code>{ "status": "active" }</code>
+    </li>
+    <li>Empty, to fetch all objects of the configured class.</li>
+  </ul>
+
+  <h2>Output</h2>
+
+  <ul>
+    <li><strong>msg.payload:</strong> Array of matching objects.</li>
+    <li><strong>msg.count:</strong> Total count (only when the query sets
+      <code>count: true</code>).</li>
+    <li><strong>msg.query:</strong> The query that was executed.</li>
+  </ul>
+</script>
