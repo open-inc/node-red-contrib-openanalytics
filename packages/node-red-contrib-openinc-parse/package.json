@@ -1,6 +1,6 @@
 {
   "name": "@openinc/node-red-contrib-openinc-parse",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Node-RED nodes to interact with a configurable Parse Server (CRUD, queries and LiveQuery subscriptions)",
   "scripts": {
     "copy": "copyfiles -u 2 \"./src/nodes/**/*.{png,svg}\" \"./dist/nodes/\"",
