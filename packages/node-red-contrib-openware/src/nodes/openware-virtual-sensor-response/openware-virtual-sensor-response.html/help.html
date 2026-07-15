@@ -1,0 +1,23 @@
+<script type="text/html" data-help-name="openware-virtual-sensor-response">
+  <p>
+    Completes a historic data request that was started by an
+    <b>openware-virtual-sensor</b> node &mdash; the same pattern as
+    <i>http in</i> &rarr; <i>http response</i>.
+  </p>
+
+  <h3>Input</h3>
+  <p>
+    The incoming message must still contain the <code>msg._owvs</code> handle
+    from the originating virtual sensor node. <code>msg.payload</code> holds
+    the computed values in one of these shapes:
+  </p>
+  <ul>
+    <li>an array of <code>{date, value}</code> objects (timestamps in ms; <code>value</code> is an array with one entry per dimension, primitives are wrapped automatically)</li>
+    <li><code>{values: [...], name?, meta?, valueTypes?}</code> &mdash; values plus optional overrides of the configured sensor fields</li>
+    <li>a primitive or array of primitives &mdash; a single reading stamped now</li>
+  </ul>
+  <p>
+    If the flow does not deliver a message to this node within the sensor's
+    configured timeout, the pending HTTP request fails with 504.
+  </p>
+</script>

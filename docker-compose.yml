@@ -11,6 +11,8 @@ services:
       - OI_PARSE_AUTH_ENABLED=${OI_PARSE_AUTH_ENABLED:-}
       - OI_PARSE_URL=${OI_PARSE_URL:-}
       - OI_PARSE_APPID=${OI_PARSE_APPID:-}
+      # Shared bearer token for the openware virtual sensor API (HTTP + WS)
+      - OPENWARE_VIRTUAL_SENSORS_TOKEN=secret
     volumes:
       # Node-RED user dir (flows.json, settings.js, installed nodes) lives on
       # the host. On first start the entrypoint seeds it with the image

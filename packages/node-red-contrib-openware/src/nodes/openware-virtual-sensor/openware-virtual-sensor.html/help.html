@@ -1,0 +1,60 @@
+<script type="text/html" data-help-name="openware-virtual-sensor">
+  <p>
+    Represents one <b>virtual sensor</b> that an open.WARE middleware can
+    discover through this Node-RED instance. Every deployed node of this type
+    registers itself and is returned by
+    <code>GET /openware/virtual-sensors</code>.
+  </p>
+
+  <h3>Input — live value updates</h3>
+  <p>
+    Send a message to the input to update the sensor's live value. The value
+    is cached (served to <code>mode=live</code> requests) and pushed to
+    connected open.WARE instances via WebSocket. Accepted
+    <code>msg.payload</code> shapes:
+  </p>
+  <ul>
+    <li>a primitive (<code>42</code>) &mdash; one reading, stamped now</li>
+    <li>an array of primitives (<code>[42, "ok"]</code>) &mdash; one reading with one entry per dimension</li>
+    <li><code>{date, value}</code> &mdash; one reading with an explicit timestamp (ms)</li>
+    <li>an array of <code>{date, value}</code> objects &mdash; multiple readings</li>
+  </ul>
+
+  <h3>Output — historic requests</h3>
+  <p>
+    When the middleware requests historic data
+    (<code>mode=historic</code>), this node emits a message:
+  </p>
+  <ul>
+    <li><code>msg.payload</code> &mdash; <code>{mode: "historic", start, end}</code> (timestamps in ms)</li>
+    <li><code>msg.sensor</code> &mdash; the configured sensor definition</li>
+    <li><code>msg._owvs</code> &mdash; internal request handle; <b>must be preserved</b></li>
+  </ul>
+  <p>
+    The flow computes the values and must end in an
+    <b>openware-virtual-sensor-response</b> node (same pattern as
+    <i>http in</i> &rarr; <i>http response</i>). If no response arrives within
+    the configured timeout, the request fails with 504. If the output is not
+    wired, historic requests return an empty result.
+  </p>
+
+  <h3>Configuration</h3>
+  <ul>
+    <li><b>Sensor ID</b> &mdash; unique id of the sensor (unique across all virtual sensor nodes)</li>
+    <li><b>Sensor Name / Source</b> &mdash; reported to open.WARE</li>
+    <li><b>Dimensions</b> &mdash; the value dimensions (name, unit, type)</li>
+    <li><b>Meta (JSON)</b> &mdash; extra metadata stored in the item's meta object</li>
+    <li><b>Timeout</b> &mdash; how long a historic request waits for the flow response</li>
+  </ul>
+
+  <h3>API &amp; security</h3>
+  <p>
+    Endpoints: <code>GET /openware/virtual-sensors</code>,
+    <code>GET /openware/virtual-sensors/:id/data?mode=live|historic&amp;start=&amp;end=</code>
+    and a WebSocket push channel at
+    <code>/openware/virtual-sensors/ws</code>. Protect them with a shared
+    bearer token via <code>openwareVirtualSensors: { token: "..." }</code> in
+    <code>settings.js</code> or the
+    <code>OPENWARE_VIRTUAL_SENSORS_TOKEN</code> environment variable.
+  </p>
+</script>

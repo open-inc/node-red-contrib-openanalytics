@@ -45,7 +45,9 @@
       "openware-item-select": "./dist/nodes/openware-item-select/openware-item-select.js",
       "openware-item-multiple-select": "./dist/nodes/openware-item-multiple-select/openware-item-multiple-select.js",
       "openware-data-historical-merge": "./dist/nodes/openware-data-historical-merge/openware-data-historical-merge.js",
-      "openware-data-pca": "./dist/nodes/openware-data-pca/openware-data-pca.js"
+      "openware-data-pca": "./dist/nodes/openware-data-pca/openware-data-pca.js",
+      "openware-virtual-sensor": "./dist/nodes/openware-virtual-sensor/openware-virtual-sensor.js",
+      "openware-virtual-sensor-response": "./dist/nodes/openware-virtual-sensor-response/openware-virtual-sensor-response.js"
     }
   },
   "dependencies": {

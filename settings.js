@@ -21,6 +21,12 @@ if (useParseAuth) {
 
 module.exports = {
   flowFile: "flows.json",
+  // Shared bearer token protecting the virtual sensor API provided by
+  // @openinc/node-red-contrib-openware (HTTP endpoints + WebSocket push).
+  // Leave unset to run the API without authentication (not recommended).
+  openwareVirtualSensors: {
+    token: process.env.OPENWARE_VIRTUAL_SENSORS_TOKEN || undefined,
+  },
   adminAuth: useParseAuth
     ? require("./user-authentication")
     : {

@@ -1,0 +1,32 @@
+<script type="text/html" data-template-name="openware-virtual-sensor">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-sensorId"><i class="fa fa-id-card-o"></i> Sensor ID</label>
+    <input type="text" id="node-input-sensorId" placeholder="e.g. machine1.temperature">
+  </div>
+  <div class="form-row">
+    <label for="node-input-sensorName"><i class="fa fa-font"></i> Sensor Name</label>
+    <input type="text" id="node-input-sensorName" placeholder="Human-readable name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-source"><i class="fa fa-sitemap"></i> Source</label>
+    <input type="text" id="node-input-source" placeholder="e.g. nodered">
+  </div>
+  <div class="form-row" style="margin-bottom: 0;">
+    <label><i class="fa fa-list"></i> Dimensions</label>
+  </div>
+  <div class="form-row">
+    <ol id="node-input-valueTypes-container"></ol>
+  </div>
+  <div class="form-row">
+    <label for="node-input-meta"><i class="fa fa-code"></i> Meta (JSON)</label>
+    <input type="text" id="node-input-meta" placeholder="{}">
+  </div>
+  <div class="form-row">
+    <label for="node-input-timeout"><i class="fa fa-clock-o"></i> Timeout (ms)</label>
+    <input type="number" id="node-input-timeout" placeholder="5000">
+  </div>
+</script>
