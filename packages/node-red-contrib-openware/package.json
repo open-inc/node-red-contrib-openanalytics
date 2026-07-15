@@ -20,7 +20,16 @@
     "node-red",
     "node",
     "IoT",
+    "IIoT",
+    "industrial-iot",
     "timeseries",
+    "sensor",
+    "sensor-data",
+    "virtual-sensor",
+    "analytics",
+    "middleware",
+    "smart-factory",
+    "openware",
     "open.WARE",
     "open.DASH",
     "open.INC"
@@ -29,6 +38,15 @@
     "open.INC GmbH"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/open-inc/node-red-contrib-openanalytics/tree/master/packages/node-red-contrib-openware#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-inc/node-red-contrib-openanalytics.git",
+    "directory": "packages/node-red-contrib-openware"
+  },
+  "bugs": {
+    "url": "https://github.com/open-inc/node-red-contrib-openanalytics/issues"
+  },
   "node-red": {
     "version": ">=2.0.0",
     "nodes": {

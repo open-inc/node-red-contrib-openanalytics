@@ -12,5 +12,13 @@
   "contributors": [
     "open.INC GmbH"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "homepage": "https://github.com/open-inc/node-red-contrib-openanalytics#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-inc/node-red-contrib-openanalytics.git"
+  },
+  "bugs": {
+    "url": "https://github.com/open-inc/node-red-contrib-openanalytics/issues"
+  }
 }

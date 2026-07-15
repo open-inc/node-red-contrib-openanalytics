@@ -20,13 +20,29 @@
     "node",
     "parse-server",
     "parse",
+    "parse-platform",
     "livequery",
+    "changestream",
+    "realtime",
+    "database",
+    "crud",
+    "query",
+    "subscription",
     "open.INC"
   ],
   "contributors": [
     "open.INC GmbH"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/open-inc/node-red-contrib-openanalytics/tree/master/packages/node-red-contrib-openinc-parse#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-inc/node-red-contrib-openanalytics.git",
+    "directory": "packages/node-red-contrib-openinc-parse"
+  },
+  "bugs": {
+    "url": "https://github.com/open-inc/node-red-contrib-openanalytics/issues"
+  },
   "node-red": {
     "version": ">=2.0.0",
     "nodes": {
