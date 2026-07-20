@@ -91,7 +91,7 @@
     "eslint-plugin-prettier": "^5.4.0",
     "glob": "^11.0.2",
     "mustache": "^4.2.0",
-    "node-red": "^1.3.7",
+    "node-red": "^5.0.1",
     "onchange": "^7.1.0",
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",

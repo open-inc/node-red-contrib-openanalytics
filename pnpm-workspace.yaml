@@ -2,3 +2,8 @@ packages:
   - "packages/*"
 allowBuilds:
   bcrypt: false
+# node-red (dev harness) and @types/node-red pull jsonata <2.2.0, which is
+# vulnerable to $toMillis resource exhaustion (GHSA-86vw-mfpg-wwv9). Upstream
+# node-red 5.0.1 has not yet released a jsonata bump, so force the patched line.
+overrides:
+  jsonata: ">=2.2.0"

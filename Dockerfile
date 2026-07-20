@@ -1,11 +1,13 @@
-FROM ubuntu:24.04
+FROM redhat/ubi10-minimal:latest
 USER root
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-RUN apt update
 
 ENV NODE_VERSION=22.20.0
 
-RUN apt install -y curl git
+# git for nvm/npm, tar+gzip+xz for extracting the Node binary tarball.
+# curl is already provided by curl-minimal on UBI, so we don't install it
+# (doing so conflicts with the preinstalled curl-minimal package).
+RUN microdnf install -y git tar gzip xz && microdnf clean all
 ENV NVM_DIR=/root/.nvm
 RUN mkdir -p /root/.nvm
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
@@ -14,8 +16,28 @@ RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
 ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 
-#Node-Red
-RUN npm install -g --unsafe-perm node-red
+# Node-RED — installed locally (not -g) so we can force a patched jsonata via
+# npm "overrides". node-red 5.0.1 pins jsonata 2.0.6 (through @node-red/util),
+# which is vulnerable to $toMillis resource exhaustion (GHSA-86vw-mfpg-wwv9);
+# the override lifts every copy to the patched >=2.2.0 line. A plain
+# `npm install -g node-red` cannot do this because overrides only apply to a
+# local (project) install. The install's bin dir is prepended to PATH so the
+# `node-red` command keeps working exactly as before.
+WORKDIR /root/nodered
+RUN cat > package.json <<'EOF'
+{
+  "name": "openinc-nodered-runtime",
+  "private": true,
+  "dependencies": {
+    "node-red": "^5.0.1"
+  },
+  "overrides": {
+    "jsonata": ">=2.2.0"
+  }
+}
+EOF
+RUN npm install --unsafe-perm
+ENV PATH="/root/nodered/node_modules/.bin:${PATH}"
 
 RUN npm install -g typescript pnpm
 
