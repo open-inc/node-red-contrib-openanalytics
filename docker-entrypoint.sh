@@ -13,7 +13,10 @@ cd /root/.node-red
 if [ ! -d node_modules/@openinc/node-red-contrib-openware ] ||
   [ ! -d node_modules/@openinc/node-red-contrib-openinc-parse ]; then
   echo "Installing open.INC Node-RED packages into /root/.node-red ..."
-  npm install \
+  # --install-links: pack & install the local packages (plus their runtime
+  # deps) as real files rather than symlinking into the build workspace, which
+  # is not present in the runtime image.
+  npm install --install-links \
     /root/nodes/packages/node-red-contrib-openware \
     /root/nodes/packages/node-red-contrib-openinc-parse
 fi

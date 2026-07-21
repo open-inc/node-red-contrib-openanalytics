@@ -8,9 +8,9 @@ services:
       # Set all three to authenticate the Node-RED editor against a Parse
       # Server instead of the default admin credentials. Users need an
       # OD3_Permission with key "openware:nodered".
-      - OI_PARSE_AUTH_ENABLED=${OI_PARSE_AUTH_ENABLED:-}
-      - OI_PARSE_URL=${OI_PARSE_URL:-}
-      - OI_PARSE_APPID=${OI_PARSE_APPID:-}
+      - OI_PARSE_AUTH_ENABLED=true
+      - OI_PARSE_URL=https://parse-demo.apps.openinc.dev/parse
+      - OI_PARSE_APPID=openinc-demo
       # Shared bearer token for the openware virtual sensor API (HTTP + WS)
       - OPENWARE_VIRTUAL_SENSORS_TOKEN=secret
     volumes:

@@ -40,15 +40,21 @@ module.exports = {
     },
     authenticate: function (username, password) {
         return new Promise(function (resolve) {
-            fetch(`${parseUrl}/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`, {
-                method: 'GET',
+            fetch(`${parseUrl}/login`, {
+                method: 'POST',
                 headers: {
-                    'X-Parse-Application-Id': parseAppId
-                }
+                    'X-Parse-Application-Id': parseAppId,
+                    'X-Parse-Revocable-Session': '1',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
             }).then(response => {
                 if (response.status !== 200) {
-                    console.log("Authentication failed for user:", username, "status:", response.status);
-                    return resolve(null);
+                    response.text().then(text => {
+                        console.log("Authentication failed for user:", username, "status:", response.status, "body:", text);
+                        resolve(null);
+                    });
+                    return;
                 }
                 response.json().then(user => {
                     checkUserPermissions(resolve, user);
