@@ -6,6 +6,8 @@ settings:
 
 overrides:
   jsonata: '>=2.2.0'
+  axios: ^1.18.0
+  body-parser: ^1.20.6
 
 importers:
 
@@ -734,8 +736,8 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  axios@1.16.0:
-    resolution: {integrity: sha512-6hp5CwvTPlN2A31g5dxnwAX0orzM7pmCRDLnZSX772mv8WDqICwFjowHuPs04Mc8deIld1+ejhtaMn5vp6b+1w==}
+  axios@1.18.1:
+    resolution: {integrity: sha512-3nTvFlvpn9Zu/RkHUqtc7/+al4UpRW5az71ap5zccp6e8RAYEzhMTecX8Dz1wWDYrPpUoB1HAQEGEAEvUr7S9g==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -761,10 +763,6 @@ packages:
 
   bl@6.1.6:
     resolution: {integrity: sha512-jLsPgN/YSvPUg9UX0Kd73CXpm2Psg9FxMeCSXnk3WBO3CMT10JMwijubhGfHCnFu6TPn1ei3b975dxv7K2pWVg==}
-
-  body-parser@1.20.5:
-    resolution: {integrity: sha512-3grm+/2tUOvu2cjJkvsIxrv/wVpfXQW4PsQHYm7yk4vfpu7Ekl6nEsYBoJUL6qDwZUx8wUhQ8tR2qz+ad9c9OA==}
-    engines: {node: '>= 0.8', npm: 1.2.8000 || >= 1.4.16}
 
   body-parser@1.20.6:
     resolution: {integrity: sha512-p5tAzS57i5MV9fZFDj9LeIiTZEufbSe2eDozP+ElheSUq1m74CRq1jI4mYNDdVs9vQztXFLuk/Gd6BWTdwRJ5g==}
@@ -2515,7 +2513,7 @@ snapshots:
       '@node-red/editor-client': 5.0.1
       '@node-red/util': 5.0.1(typescript@5.9.3)
       bcryptjs: 3.0.3
-      body-parser: 1.20.5
+      body-parser: 1.20.6
       clone: 2.1.2
       cors: 2.8.5
       express: 4.22.2
@@ -2544,7 +2542,7 @@ snapshots:
       acorn: 8.16.0
       acorn-walk: 8.3.5
       ajv: 8.18.0
-      body-parser: 1.20.5
+      body-parser: 1.20.6
       cheerio: 1.0.0-rc.10
       content-type: 1.0.5
       cookie: 0.7.2
@@ -3062,13 +3060,15 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.16.0:
+  axios@1.18.1:
     dependencies:
       follow-redirects: 1.16.0
       form-data: 4.0.6
+      https-proxy-agent: 5.0.1
       proxy-from-env: 2.1.0
     transitivePeerDependencies:
       - debug
+      - supports-color
 
   balanced-match@1.0.2: {}
 
@@ -3090,23 +3090,6 @@ snapshots:
       buffer: 6.0.3
       inherits: 2.0.4
       readable-stream: 4.7.0
-
-  body-parser@1.20.5:
-    dependencies:
-      bytes: 3.1.2
-      content-type: 1.0.5
-      debug: 2.6.9
-      depd: 2.0.0
-      destroy: 1.2.0
-      http-errors: 2.0.1
-      iconv-lite: 0.4.24
-      on-finished: 2.4.1
-      qs: 6.15.3
-      raw-body: 2.5.3
-      type-is: 1.6.18
-      unpipe: 1.0.0
-    transitivePeerDependencies:
-      - supports-color
 
   body-parser@1.20.6:
     dependencies:
@@ -4054,7 +4037,7 @@ snapshots:
   node-red-admin@4.1.6:
     dependencies:
       ansi-colors: 4.1.3
-      axios: 1.16.0
+      axios: 1.18.1
       bcryptjs: 3.0.3
       cli-table: 0.3.11
       enquirer: 2.4.1
@@ -4065,6 +4048,7 @@ snapshots:
       '@node-rs/bcrypt': 1.10.7
     transitivePeerDependencies:
       - debug
+      - supports-color
 
   node-red@5.0.1(typescript@5.9.3):
     dependencies:
