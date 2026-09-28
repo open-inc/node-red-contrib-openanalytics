@@ -1,5 +1,6 @@
 import { EditorRED } from "node-red";
 import { OpenwareConfigEditorNodeProperties } from "./modules/types";
+import { ConnectionCheck, ConnectionTestResult } from "../shared/types";
 
 declare const RED: EditorRED;
 
@@ -21,6 +22,29 @@ function renderStatus(s: LoginStatus | null | undefined) {
   const text = s?.text ?? "unknown";
   $("#openware-config-login-dot").css("background", STATE_COLOR[state] ?? "#bbb");
   $("#openware-config-login-text").text(text);
+}
+
+// check === null while the test is still running
+function renderCheck(
+  selector: string,
+  label: string,
+  check: ConnectionCheck | null
+) {
+  const [icon, color] = !check
+    ? ["fa-spinner fa-spin", STATE_COLOR["logging-in"]]
+    : check.ok === true
+    ? ["fa-check-circle", STATE_COLOR.ok]
+    : check.ok === false
+    ? ["fa-times-circle", STATE_COLOR.failed]
+    : ["fa-minus-circle", STATE_COLOR.idle];
+  $(selector)
+    .empty()
+    .append(
+      $("<i>").addClass(`fa fa-fw ${icon}`).css("color", color),
+      " ",
+      $("<b>").text(`${label}: `),
+      $("<span>").text(check ? check.text : "testing...")
+    );
 }
 
 RED.nodes.registerType<OpenwareConfigEditorNodeProperties>("openware-config", {
@@ -64,6 +88,39 @@ RED.nodes.registerType<OpenwareConfigEditorNodeProperties>("openware-config", {
     };
     (RED.comms as any).subscribe(topic, handler);
     (node as any)._openwareStatusHandler = { topic, handler };
+
+    // Runs in the runtime: the dialog only has a placeholder for a saved
+    // password, and the runtime is what actually talks to open.WARE
+    $("#openware-config-test").on("click", () => {
+      const button = $("#openware-config-test");
+      button.prop("disabled", true);
+      $("#openware-config-test-result").show();
+      renderCheck("#openware-config-test-credentials", "Credentials", null);
+      renderCheck("#openware-config-test-session", "Session", null);
+      $.ajax({
+        url: "openware/config/test",
+        type: "POST",
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify({
+          id: node.id,
+          host: $("#node-config-input-host").val(),
+          port: $("#node-config-input-port").val(),
+          username: $("#node-config-input-username").val(),
+          password: $("#node-config-input-password").val(),
+        }),
+      })
+        .done((result: ConnectionTestResult) => {
+          renderCheck("#openware-config-test-credentials", "Credentials", result.credentials);
+          renderCheck("#openware-config-test-session", "Session", result.session);
+        })
+        .fail((xhr) => {
+          const failed = { ok: false, text: `Test request failed: HTTP ${xhr.status}` };
+          renderCheck("#openware-config-test-credentials", "Credentials", failed);
+          renderCheck("#openware-config-test-session", "Session", failed);
+        })
+        .always(() => button.prop("disabled", false));
+    });
   },
   oneditcancel: function () {
     const h = (this as any)._openwareStatusHandler;

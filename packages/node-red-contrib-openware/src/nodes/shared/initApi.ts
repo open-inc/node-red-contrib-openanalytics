@@ -9,6 +9,7 @@ import {
 } from "./types";
 import { errorType, OWItemType } from "./types";
 import { connect, scheduleReconnect } from "./connectWS";
+import { checkSession, requestSession } from "./auth";
 import { WebSocket } from "ws";
 import { randomUUID } from "crypto";
 import type { NodeAPI } from "node-red";
@@ -75,30 +76,22 @@ export async function initApi(node: ConfigNode, RED: NodeAPI) {
       }
       setLoginStatus("logging-in", "logging in...");
       try {
-        const resp = await fetch(`${node.host}:${node.port}/user/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            user: node.credentials.username,
-            password: node.credentials.password,
-          }),
-        });
-        if (!resp.ok) {
-          const msg = `Login failed: HTTP ${resp.status} ${resp.statusText}`;
-          node.warn(msg);
-          setLoginStatus("failed", `HTTP ${resp.status}`);
+        const result = await requestSession(
+          `${node.host}:${node.port}`,
+          node.credentials.username,
+          node.credentials.password
+        );
+        // explicit comparison: the editor bundle compiles this file without
+        // strictNullChecks, where !result.ok would not narrow the union
+        if (result.ok === false) {
+          node.warn(`Login failed: ${result.reason}`);
+          setLoginStatus("failed", result.reason);
           return false;
         }
-        const json = (await resp.json()) as { session?: string };
-        if (json?.session) {
-          node.credentials.session = json.session;
-          node.log("Login succeeded — session refreshed");
-          setLoginStatus("ok", "logged in");
-          return true;
-        }
-        node.warn("Login response missing 'session' field");
-        setLoginStatus("failed", "Bad login response");
-        return false;
+        node.credentials.session = result.session;
+        node.log("Login succeeded — session refreshed");
+        setLoginStatus("ok", "logged in");
+        return true;
       } catch (e) {
         node.error(`Login error: ${(e as Error)?.message ?? e}`);
         setLoginStatus("failed", "Login error");
@@ -109,6 +102,30 @@ export async function initApi(node: ConfigNode, RED: NodeAPI) {
     })();
     return loginPromise;
   };
+
+  let sessionCheckPromise: Promise<boolean> | null = null;
+  const isSessionValid = async (): Promise<boolean> => {
+    if (!node.credentials.session) return false;
+    if (sessionCheckPromise) return sessionCheckPromise;
+    sessionCheckPromise = (async () => {
+      try {
+        return await checkSession(
+          `${node.host}:${node.port}`,
+          node.credentials.session
+        );
+      } catch (e) {
+        node.warn(`Session check failed: ${(e as Error)?.message ?? e}`);
+        return false;
+      } finally {
+        sessionCheckPromise = null;
+      }
+    })();
+    return sessionCheckPromise;
+  };
+
+  // open.WARE answers an invalid or expired session with 403, not 401
+  const isAuthError = (resp: Response) =>
+    resp.status === 401 || resp.status === 403;
 
   const authFetch = async (
     url: string,
@@ -123,9 +140,22 @@ export async function initApi(node: ConfigNode, RED: NodeAPI) {
         },
       });
     let resp = await doFetch();
-    if (resp.status === 401 && (await login())) {
+    if (!isAuthError(resp)) return resp;
+    // only log in again if the session itself is gone; a 403 with a valid
+    // session means this request was rejected (e.g. missing permission)
+    if (!(await isSessionValid()) && (await login())) {
       resp = await doFetch();
+      if (!isAuthError(resp)) return resp;
     }
+    const reason = await resp
+      .clone()
+      .text()
+      .catch(() => "");
+    node.warn(
+      `${init?.method ?? "GET"} ${url} rejected with HTTP ${resp.status}${
+        resp.statusText ? ` ${resp.statusText}` : ""
+      }${reason ? `: ${reason.slice(0, 500)}` : ""}`
+    );
     return resp;
   };
 
@@ -346,11 +376,11 @@ export async function initApi(node: ConfigNode, RED: NodeAPI) {
   };
 
   setLoginStatus("idle", "starting...");
-  // If we already have a session, try to use it; otherwise attempt a login first
-  if (!node.credentials.session) {
-    await login();
+  // Reuse a stored session only if open.WARE still accepts it
+  if (await isSessionValid()) {
+    setLoginStatus("ok", "session valid");
   } else {
-    setLoginStatus("ok", "session present");
+    await login();
   }
   connect(node);
 }
