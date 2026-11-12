@@ -32,10 +32,29 @@ docker compose up --build
 ```
 
 Node-RED is served on <http://localhost:1880>. The Node-RED user dir
-(`flows.json`, `settings.js`, installed nodes) is bind-mounted to
-`./node-red/data` on the host, so flows survive container rebuilds and can be
-edited directly. On first start the entrypoint seeds the folder with the
-image defaults and installs both workspace packages into it.
+(`/data` in the container: `flows.json`, `settings.js`, nodes installed via the
+palette) is bind-mounted to `./node-red/data` on the host, so flows survive
+container rebuilds and can be edited directly. On first start the entrypoint
+seeds the folder with the image defaults. Both open.INC packages are part of
+the image (`/opt/node-red/node_modules`) and need no installation in `/data`.
+
+The image is based on Red Hat's UBI 10 Node.js images and runs as a non-root
+user (uid `1001`, gid `0`). It also runs under an arbitrary uid in group `0`
+(e.g. OpenShift) without further configuration.
+
+On **Linux hosts** the bind-mounted folder must be writable by that user:
+
+```bash
+mkdir -p node-red/data && sudo chown -R 1001:0 node-red/data
+```
+
+(Docker Desktop on macOS/Windows handles this automatically.)
+
+**Migrating** a `./node-red/data` folder from the older root-based image:
+
+1. Run the `chown` above once. The old image wrote the files as root.
+2. Delete `node-red/data/node_modules/@openinc/`. Node-RED prefers modules in
+   the user dir, so a leftover copy would shadow the version in the image.
 
 ### Editor authentication
 

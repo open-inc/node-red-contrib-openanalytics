@@ -14,12 +14,13 @@ services:
       # Shared bearer token for the openware virtual sensor API (HTTP + WS)
       - OPENWARE_VIRTUAL_SENSORS_TOKEN=secret
     volumes:
-      # Node-RED user dir (flows.json, settings.js, installed nodes) lives on
-      # the host. On first start the entrypoint seeds it with the image
-      # defaults and installs both workspace packages into it.
-      - ./node-red/data:/root/.node-red
+      # Node-RED user dir (flows.json, settings.js, nodes installed via the
+      # palette) lives on the host. On first start the entrypoint seeds it
+      # with the image defaults. The container runs as uid 1001 / gid 0; on
+      # Linux hosts run `sudo chown -R 1001:0 node-red/data` once.
+      - ./node-red/data:/data
       # Optional: mount the built packages for live development. Rebuild on
       # the host (pnpm build), then restart the container:
-      # - ./packages/node-red-contrib-openware:/root/nodes/packages/node-red-contrib-openware
-      # - ./packages/node-red-contrib-openinc-parse:/root/nodes/packages/node-red-contrib-openinc-parse
+      # - ./packages/node-red-contrib-openware/dist:/opt/node-red/node_modules/@openinc/node-red-contrib-openware/dist
+      # - ./packages/node-red-contrib-openinc-parse/dist:/opt/node-red/node_modules/@openinc/node-red-contrib-openinc-parse/dist
     restart: unless-stopped

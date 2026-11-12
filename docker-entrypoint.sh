@@ -1,24 +1,26 @@
 #!/bin/bash
 set -e
 
-cd /root/.node-red
+# Files written to /data stay group-writable, so any uid in group 0 (e.g.
+# OpenShift's random uids) can keep using the same volume.
+umask 0002
 
-# Seed a freshly mounted (empty) user dir with the image defaults.
-[ -f settings.js ] || cp /root/defaults/settings.js ./settings.js
-[ -f flows.json ] || cp /root/defaults/flows.json ./flows.json
-[ -f user-authentication.js ] || cp /root/defaults/user-authentication.js ./user-authentication.js
+USER_DIR=/data
+DEFAULTS=/opt/node-red/defaults
 
-# (Re-)install the workspace packages when they are missing, e.g. after the
-# user dir was bind-mounted from the host for the first time.
-if [ ! -d node_modules/@openinc/node-red-contrib-openware ] ||
-  [ ! -d node_modules/@openinc/node-red-contrib-openinc-parse ]; then
-  echo "Installing open.INC Node-RED packages into /root/.node-red ..."
-  # --install-links: pack & install the local packages (plus their runtime
-  # deps) as real files rather than symlinking into the build workspace, which
-  # is not present in the runtime image.
-  npm install --install-links \
-    /root/nodes/packages/node-red-contrib-openware \
-    /root/nodes/packages/node-red-contrib-openinc-parse
+if [ ! -w "$USER_DIR" ]; then
+  echo "ERROR: $USER_DIR is not writable by uid $(id -u) gid $(id -g)." >&2
+  echo "If $USER_DIR is a bind mount, make it writable for the container user," >&2
+  echo "e.g. 'sudo chown -R 1001:0 <host-dir>' or run the container with --user." >&2
+  exit 1
 fi
+
+cd "$USER_DIR"
+
+# Seed a freshly mounted (empty) user dir with the image defaults. The open.INC
+# nodes themselves live in /opt/node-red and need no installation here.
+for f in settings.js flows.json user-authentication.js; do
+  [ -f "$f" ] || install -m 664 "$DEFAULTS/$f" "./$f"
+done
 
 exec "$@"
