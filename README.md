@@ -74,3 +74,15 @@ Users log in with their Parse credentials and additionally need an
 URL or app id are missing, Node-RED falls back to the default credentials
 and logs a warning.
 
+### Credential secret
+
+Set `NODE_RED_CREDENTIAL_SECRET` to control the key Node-RED uses to encrypt
+the credentials stored in flows (`flows_cred.json`). If unset, Node-RED
+generates a key and stores it in `.config.runtime.json` in the user dir. Keep
+the value unchanged once credentials have been stored, otherwise they become
+unreadable.
+
+Note: `settings.js` is only copied into `/data` when it does not exist yet.
+Existing user dirs keep their old `settings.js`; add the `credentialSecret`
+line there manually (or delete the file to re-seed it from the image).
+

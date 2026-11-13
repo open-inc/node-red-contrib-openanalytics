@@ -21,6 +21,10 @@ if (useParseAuth) {
 
 module.exports = {
   flowFile: "flows.json",
+  // Key used to encrypt flow credentials (flows_cred.json). If unset, Node-RED
+  // generates one and stores it in .config.runtime.json in the user dir.
+  // Must not change once credentials have been stored.
+  credentialSecret: process.env.NODE_RED_CREDENTIAL_SECRET || undefined,
   // Shared bearer token protecting the virtual sensor API provided by
   // @openinc/node-red-contrib-openware (HTTP endpoints + WebSocket push).
   // Leave unset to run the API without authentication (not recommended).
