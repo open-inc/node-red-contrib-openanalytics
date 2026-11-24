@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 22
           registry-url: "https://registry.npmjs.org"
-      - uses: open-inc/github-action-npm-login@v1
+      - uses: open-inc/github-action-npm-login@v2
         env:
           NPM_REGISTRY: ${{secrets.OPENINC_NPM_REGISTRY }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN_ORG_OPENINC  }}
