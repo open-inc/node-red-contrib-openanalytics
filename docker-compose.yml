@@ -13,6 +13,14 @@ services:
       - OI_PARSE_APPID=openinc-demo
       # Shared bearer token for the openware virtual sensor API (HTTP + WS)
       - OPENWARE_VIRTUAL_SENSORS_TOKEN=secret
+      # Turn off bundled open.INC node packages (all ON by default; use
+      # 0/false/no/off). Disabled packages are not loaded at all; flows that
+      # still use their nodes will not start ("missing node types").
+      # OPENSERVICE requires PARSE: disabling PARSE disables OPENSERVICE too,
+      # and Node-RED refuses to start if OPENSERVICE is explicitly enabled.
+      # - OI_NODES_PARSE=false
+      # - OI_NODES_OPENWARE=false
+      # - OI_NODES_OPENSERVICE=false
     volumes:
       # Node-RED user dir (flows.json, settings.js, nodes installed via the
       # palette) lives on the host. On first start the entrypoint seeds it

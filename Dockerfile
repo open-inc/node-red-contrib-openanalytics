@@ -67,6 +67,7 @@ EOF
 RUN npm install --omit=dev --install-links \
       /build/packages/node-red-contrib-openware \
       /build/packages/node-red-contrib-openinc-parse \
+      @openinc/node-red-contrib-openservice \
   && npm cache clean --force
 
 # Defaults the entrypoint copies into an empty /data on first start.

@@ -86,3 +86,29 @@ Note: `settings.js` is only copied into `/data` when it does not exist yet.
 Existing user dirs keep their old `settings.js`; add the `credentialSecret`
 line there manually (or delete the file to re-seed it from the image).
 
+
+### Available node packages
+
+The open.INC node packages bundled in the image are **on by default**. Turn
+one off with an environment variable set to `0`/`false`/`no`/`off`
+(`1`/`true`/`yes`/`on` or unset keeps it on; any other value stops Node-RED
+with an error).
+
+| Variable               | Package                                   |
+| ---------------------- | ----------------------------------------- |
+| `OI_NODES_PARSE`       | `@openinc/node-red-contrib-openinc-parse` |
+| `OI_NODES_OPENWARE`    | `@openinc/node-red-contrib-openware`      |
+| `OI_NODES_OPENSERVICE` | `@openinc/node-red-contrib-openservice`   |
+
+The openservice nodes depend on the parse nodes. Turning `OI_NODES_PARSE` off
+also turns openservice off; if `OI_NODES_OPENSERVICE` is explicitly on at the
+same time, Node-RED refuses to start.
+
+Disabled packages are added to Node-RED's palette `denyList`
+(`externalModules.palette.denyList` in `settings.js`). They are not loaded at
+all, so their nodes are missing from the palette and the packages cannot be
+installed through the palette manager. Flows that still use their nodes will
+not start ("missing node types").
+
+As with the credential secret, existing user dirs need the updated
+`settings.js` (delete `/data/settings.js` to re-seed it from the image).
